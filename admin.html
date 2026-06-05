@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suvita Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#03040a;--s1:#080c18;--s2:#0d1225;--s3:#131830;--s4:#1a1f3a;
+  --b0:rgba(255,255,255,.06);--b1:rgba(255,255,255,.10);--b2:rgba(255,255,255,.16);
+  --pri:#4f8fff;--coral:#ff6b6b;--teal:#38d9a9;--amber:#f59e0b;--purple:#8b5cf6;--gold:#f5a623;
+  --grad:linear-gradient(135deg,#4f8fff,#8b5cf6);
+  --t1:#f0f0ff;--t2:#9090b8;--t3:#50507a;
+  --r:12px;--r2:8px;--f:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at 20% 50%,rgba(79,143,255,.06),transparent 60%)}
+.login-box{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:36px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.4)}
+.login-logo{font-size:24px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--t2);margin-bottom:28px}
+#app{display:none;min-height:100vh}
+.top{height:56px;background:var(--s1);border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.top-left{display:flex;align-items:center;gap:16px}
+.top-logo{font-size:17px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.top-tabs{display:flex;gap:2px}
+.top-tab{padding:5px 14px;border-radius:var(--r2);font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;transition:all .15s;border:none;background:none;font-family:var(--f)}
+.top-tab.on{background:var(--s3);color:var(--t1)}
+.top-right{display:flex;align-items:center;gap:10px}
+.top-right span{font-size:12px;color:var(--t2)}
+.main{padding:24px;max-width:1280px;margin:0 auto}
+.pg{display:none}.pg.on{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.met{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:18px;transition:border-color .15s}
+.met:hover{border-color:var(--b1)}
+.met-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.met-val{font-size:30px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.met-sub{font-size:11px;color:var(--t2);margin-top:4px}
+.met-trend{font-size:11px;font-weight:700;margin-top:6px}
+.trend-up{color:var(--teal)}.trend-dn{color:var(--coral)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b0)}
+.card-title{font-size:14px;font-weight:700}
+.card-body{padding:20px}
+.search-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-inp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);color:var(--t1);font-family:var(--f);font-size:13px;padding:7px 12px;outline:none;width:200px;transition:border-color .15s}
+.search-inp:focus{border-color:var(--pri)}
+.filter-sel{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);color:var(--t1);font-family:var(--f);font-size:12px;padding:7px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--s2);padding:10px 16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);text-align:left;white-space:nowrap}
+tbody td{padding:11px 16px;font-size:13px;border-bottom:1px solid var(--b0)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.018)}
+.badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;white-space:nowrap}
+.badge-pro{background:rgba(79,143,255,.15);color:var(--pri);border:1px solid rgba(79,143,255,.2)}
+.badge-free{background:rgba(144,144,184,.08);color:var(--t3);border:1px solid var(--b0)}
+.badge-ativo{background:rgba(56,217,169,.12);color:var(--teal);border:1px solid rgba(56,217,169,.15)}
+.badge-bloq{background:rgba(255,107,107,.12);color:var(--coral);border:1px solid rgba(255,107,107,.15)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r2);border:none;font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-pri{background:var(--grad);color:#fff}.btn-pri:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn-ghost{background:var(--s3);color:var(--t2);border:1px solid var(--b1)}.btn-ghost:hover{color:var(--t1)}
+.btn-green{background:rgba(56,217,169,.12);color:var(--teal);border:1px solid rgba(56,217,169,.18)}.btn-green:hover{background:rgba(56,217,169,.22)}
+.btn-red{background:rgba(255,107,107,.1);color:var(--coral);border:1px solid rgba(255,107,107,.18)}.btn-red:hover{background:rgba(255,107,107,.2)}
+.btn-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.18)}.btn-amber:hover{background:rgba(245,158,11,.2)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px}
+input,select,textarea{width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);color:var(--t1);font-family:var(--f);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--pri)}
+textarea{resize:vertical;min-height:80px}
+.ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px}
+.ov.on{display:flex}
+.modal{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:26px;width:100%;max-width:440px;animation:fadeM .2s ease;max-height:90vh;overflow-y:auto}
+@keyframes fadeM{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:20px}
+.modal-foot{display:flex;gap:8px;margin-top:20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--s4);border:1px solid var(--b1);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:all .25s ease;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-row td{text-align:center;padding:40px;color:var(--t3)}
+.refresh-btn{width:30px;height:30px;background:var(--s3);border:1px solid var(--b0);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all .15s}
+.refresh-btn:hover{color:var(--t1)}.refresh-btn svg{width:13px;height:13px}
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.user-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.user-av-ph{width:30px;height:30px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0}
+.webhook-box{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;font-size:12px;font-family:monospace;word-break:break-all;color:var(--teal);position:relative;cursor:pointer}
+.webhook-box:hover{border-color:var(--b2)}
+.copy-hint{position:absolute;top:8px;right:10px;font-size:10px;color:var(--t3);font-family:var(--f)}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{font-size:12px;color:var(--t2)}
+.stat-val{font-size:13px;font-weight:700}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
+@media(max-width:768px){.metrics{grid-template-columns:1fr 1fr}.search-wrap{flex-direction:column;align-items:flex-start}.search-inp{width:100%}table{min-width:700px}.card{overflow-x:auto}.top-tabs{display:none}}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Suvita Admin</div>
+    <div class="login-sub">Painel de administração e assinaturas</div>
+    <div class="field"><label>E-mail admin</label><input id="adm-email" type="email" placeholder="seu@email.com" autocomplete="email"></div>
+    <div class="field" style="margin-bottom:22px"><label>Senha</label><input id="adm-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="btn btn-pri" style="width:100%;padding:12px;font-size:14px;justify-content:center" onclick="adminLogin()">Entrar no painel</button>
+    <div id="login-err" style="font-size:12px;color:var(--coral);margin-top:10px;text-align:center"></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="top">
+    <div class="top-left">
+      <div class="top-logo">Suvita Admin</div>
+      <div class="top-tabs">
+        <button class="top-tab on" onclick="mudarAba('pg-usuarios',this)">Usuários</button>
+        <button class="top-tab" onclick="mudarAba('pg-receita',this)">Receita</button>
+        <button class="top-tab" onclick="mudarAba('pg-webhook',this)">Kiwify</button>
+      </div>
+    </div>
+    <div class="top-right">
+      <span id="adm-email-label"></span>
+      <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">↓ CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ABA USUÁRIOS -->
+    <div class="pg on" id="pg-usuarios">
+      <div class="metrics">
+        <div class="met"><div class="met-lbl">Total usuários</div><div class="met-val" id="m-total">—</div><div class="met-sub" id="m-total-sub"></div></div>
+        <div class="met"><div class="met-lbl">Assinantes Pro</div><div class="met-val" id="m-pro" style="color:var(--pri)">—</div><div class="met-trend" id="m-pro-pct"></div></div>
+        <div class="met"><div class="met-lbl">Plano Gratuito</div><div class="met-val" id="m-free" style="color:var(--t2)">—</div></div>
+        <div class="met"><div class="met-lbl">Bloqueados</div><div class="met-val" id="m-bloq" style="color:var(--coral)">—</div></div>
+        <div class="met"><div class="met-lbl">MRR estimado</div><div class="met-val" id="m-mrr" style="color:var(--teal)">—</div><div class="met-sub">R$ 19/assinante</div></div>
+        <div class="met"><div class="met-lbl">ARR projetado</div><div class="met-val" id="m-arr" style="color:var(--gold)">—</div><div class="met-sub">receita anual</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Usuários</div>
+          <div class="search-wrap">
+            <input class="search-inp" type="text" placeholder="Buscar nome ou e-mail..." id="busca-user" oninput="filtrarUsuarios()">
+            <select class="filter-sel" id="filtro-plano" onchange="filtrarUsuarios()">
+              <option value="">Todos os planos</option><option value="pro">Pro</option><option value="gratuito">Gratuito</option>
+            </select>
+            <select class="filter-sel" id="filtro-status" onchange="filtrarUsuarios()">
+              <option value="">Todos status</option><option value="ativo">Ativo</option><option value="bloqueado">Bloqueado</option>
+            </select>
+            <button class="refresh-btn" id="refresh-btn" onclick="carregarUsuarios()" title="Atualizar">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 8A6 6 0 1 1 8 2a6 6 0 0 1 4.5 2L14 2v4h-4"/></svg>
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>E-mail</th><th>Plano</th><th>Status</th><th>Cadastro</th><th>Pro desde</th><th>Ações</th></tr></thead>
+          <tbody id="tabela-usuarios"><tr class="empty-row"><td colspan="7">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA RECEITA -->
+    <div class="pg" id="pg-receita">
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Crescimento de assinantes Pro</div></div>
+          <div class="card-body"><div style="position:relative;height:220px"><canvas id="ch-crescimento"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Distribuição de planos</div></div>
+          <div class="card-body" style="display:flex;align-items:center;justify-content:center;height:220px">
+            <canvas id="ch-pizza" style="max-height:200px;max-width:200px"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Resumo financeiro</div></div>
+          <div class="card-body">
+            <div class="stat-row"><span class="stat-label">MRR atual</span><span class="stat-val" style="color:var(--teal)" id="rf-mrr">—</span></div>
+            <div class="stat-row"><span class="stat-label">ARR projetado</span><span class="stat-val" style="color:var(--gold)" id="rf-arr">—</span></div>
+            <div class="stat-row"><span class="stat-label">Ticket médio</span><span class="stat-val">R$ 19,00</span></div>
+            <div class="stat-row"><span class="stat-label">Assinantes ativos</span><span class="stat-val" style="color:var(--pri)" id="rf-pro">—</span></div>
+            <div class="stat-row"><span class="stat-label">Taxa de conversão</span><span class="stat-val" id="rf-conv">—</span></div>
+            <div class="stat-row"><span class="stat-label">Usuários bloqueados</span><span class="stat-val" style="color:var(--coral)" id="rf-bloq">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Últimas ativações Pro</div></div>
+          <div class="card-body"><div id="ultimas-ativacoes" style="display:flex;flex-direction:column;gap:12px"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA KIWIFY -->
+    <div class="pg" id="pg-webhook">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-head"><div class="card-title">🔗 Integração Kiwify → Supabase (automático)</div></div>
+        <div class="card-body">
+          <p style="color:var(--t2);font-size:13px;margin-bottom:18px">Quando alguém assinar via Kiwify, o plano Pro é ativado automaticamente no Suvita sem você precisar fazer nada.</p>
+          <div style="margin-bottom:18px">
+            <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px">PASSO 1 — URL do Webhook</div>
+            <div class="webhook-box" onclick="copiarWebhook()" id="webhook-url">https://frvjcwixaftjahrkszqy.supabase.co/functions/v1/kiwify-webhook<span class="copy-hint">clique para copiar</span></div>
+          </div>
+          <div style="margin-bottom:18px">
+            <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px">PASSO 2 — No painel Kiwify</div>
+            <ol style="color:var(--t2);font-size:13px;line-height:2.2;padding-left:18px">
+              <li>Acesse <strong style="color:var(--t1)">kiwify.com.br</strong> → seu produto → <strong style="color:var(--t1)">Configurações → Webhooks</strong></li>
+              <li>Clique em <strong style="color:var(--t1)">"Adicionar webhook"</strong></li>
+              <li>Cole a URL acima no campo</li>
+              <li>Selecione os eventos: <span style="color:var(--teal);font-weight:700">order_approved</span> e <span style="color:var(--teal);font-weight:700">subscription_active</span></li>
+              <li>Salve — o resto é automático 🎉</li>
+            </ol>
+          </div>
+          <div style="margin-bottom:18px">
+            <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px">PASSO 3 — Criar Edge Function no Supabase</div>
+            <p style="color:var(--t2);font-size:12px;margin-bottom:8px">No painel Supabase → Edge Functions → New Function → nome: <code style="color:var(--teal)">kiwify-webhook</code> → cole o código:</p>
+            <div class="webhook-box" style="font-size:11px;line-height:1.7;white-space:pre-wrap;cursor:pointer" onclick="copiarFuncao()" id="edge-fn-code">// supabase/functions/kiwify-webhook/index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+
+serve(async (req) => {
+  const body = await req.json()
+  const email = body?.Customer?.email || body?.customer?.email
+  const event = body?.status || body?.event || ''
+  if (!email) return new Response('no email', { status: 400 })
+
+  const isActive = ['paid','approved','active','order_approved','subscription_active']
+    .some(s => event.toLowerCase().includes(s))
+
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  )
+
+  const { data: users } = await supabase.auth.admin.listUsers()
+  const user = users?.users?.find(u => u.email === email)
+  if (!user) return new Response('user not found', { status: 404 })
+
+  await supabase.from('profiles').update({
+    plano: isActive ? 'pro' : 'gratuito',
+    pro_since: isActive ? new Date().toISOString() : null
+  }).eq('id', user.id)
+
+  return new Response(JSON.stringify({ ok: true, plano: isActive ? 'pro' : 'gratuito' }))
+})<span class="copy-hint">clique para copiar</span></div>
+          </div>
+          <div style="background:rgba(56,217,169,.08);border:1px solid rgba(56,217,169,.2);border-radius:var(--r2);padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ Fluxo completo</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.8">Cliente paga na Kiwify → webhook dispara → Edge Function busca o usuário pelo e-mail → atualiza <code style="color:var(--teal)">plano = 'pro'</code> → badge Pro aparece no Suvita na próxima vez que ele fizer login.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Ativar Pro manualmente por e-mail</div></div>
+        <div class="card-body">
+          <p style="color:var(--t2);font-size:13px;margin-bottom:14px">Use quando o cliente pagar por outro meio ou precisar de acesso imediato.</p>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div class="field" style="flex:1;margin:0"><label>E-mail do usuário</label><input id="manual-email" type="email" placeholder="cliente@email.com"></div>
+            <button class="btn btn-pri" onclick="ativarProManual()" style="flex-shrink:0">Ativar Pro</button>
+          </div>
+          <div id="manual-msg" style="font-size:12px;margin-top:8px;min-height:16px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="ov" id="ov-user">
+  <div class="modal">
+    <div class="modal-title">Editar usuário</div>
+    <input type="hidden" id="edit-user-id">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--s3);border-radius:var(--r2);margin-bottom:18px">
+      <div id="edit-av" class="user-av-ph">?</div>
+      <div><div id="edit-display-nome" style="font-weight:700;font-size:14px"></div><div id="edit-display-email" style="font-size:12px;color:var(--t2)"></div></div>
+    </div>
+    <div class="field"><label>Nome</label><input id="edit-nome" type="text" maxlength="60"></div>
+    <div class="field"><label>Plano</label><select id="edit-plano"><option value="gratuito">Gratuito</option><option value="pro">Pro ✦</option></select></div>
+    <div class="field"><label>Status</label><select id="edit-status"><option value="ativo">Ativo</option><option value="bloqueado">Bloqueado</option></select></div>
+    <div class="field"><label>Observação interna</label><textarea id="edit-obs" placeholder="Ex: assinou via indicação, cliente VIP..."></textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-pri" onclick="salvarUsuario()">Salvar</button>
+      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+var SUPA_URL    = 'https://frvjcwixaftjahrkszqy.supabase.co';
+var SUPA_KEY    = 'sb_publishable_4WajZbLMppY4KVRn46Urkg_U72_GfdC';
+var ADMIN_EMAIL = 'leitefelipe570@gmail.com';
+var sb=null, TODOS=[], CURRENT_USER=null, chC=null, chP=null;
+
+function initSb(){ if(!sb&&window.supabase) sb=window.supabase.createClient(SUPA_URL,SUPA_KEY); return !!sb; }
+
+var _tT=null;
+function toast(msg,type){ if(_tT)clearTimeout(_tT); var t=document.getElementById('toast'); t.textContent=msg; t.style.borderColor=type==='err'?'var(--coral)':type==='ok'?'var(--teal)':'var(--b1)'; t.classList.add('on'); _tT=setTimeout(function(){t.classList.remove('on');},2800); }
+function esc(s){ return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fR(v){ return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function mudarAba(pgId,btn){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.top-tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById(pgId).classList.add('on'); btn.classList.add('on');
+  if(pgId==='pg-receita') renderReceita();
+}
+
+async function adminLogin(){
+  if(!initSb()){document.getElementById('login-err').textContent='Erro Supabase';return;}
+  var email=document.getElementById('adm-email').value.trim();
+  var pass=document.getElementById('adm-pass').value;
+  if(!email||!pass){document.getElementById('login-err').textContent='Preencha todos os campos';return;}
+  var res=await sb.auth.signInWithPassword({email,password:pass});
+  if(res.error){document.getElementById('login-err').textContent='E-mail ou senha incorretos';return;}
+  if(res.data.user.email!==ADMIN_EMAIL){await sb.auth.signOut();document.getElementById('login-err').textContent='Acesso restrito ao administrador';return;}
+  CURRENT_USER=res.data.user; mostrarApp();
+}
+
+async function adminLogout(){
+  if(sb) await sb.auth.signOut();
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none'; TODOS=[];
+}
+
+function mostrarApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('adm-email-label').textContent=CURRENT_USER.email;
+  carregarUsuarios();
+}
+
+async function carregarUsuarios(){
+  if(!initSb()) return;
+  var svg=document.getElementById('refresh-btn').querySelector('svg');
+  svg.classList.add('spin');
+  var res=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  svg.classList.remove('spin');
+  if(res.error){toast('Erro: '+res.error.message,'err');return;}
+  TODOS=res.data||[]; calcularMetricas(); renderTabela(TODOS);
+}
+
+function calcularMetricas(){
+  var total=TODOS.length, pro=TODOS.filter(function(u){return u.plano==='pro';}).length;
+  var free=total-pro, bloq=TODOS.filter(function(u){return u.status==='bloqueado';}).length;
+  var mrr=pro*19, arr=mrr*12, conv=total?Math.round((pro/total)*100):0;
+  document.getElementById('m-total').textContent=total;
+  document.getElementById('m-total-sub').textContent=total+' cadastro'+(total!==1?'s':'');
+  document.getElementById('m-pro').textContent=pro;
+  document.getElementById('m-pro-pct').innerHTML=pro>0?'<span class="trend-up">▲ '+conv+'% conversão</span>':'<span style="color:var(--t3)">0% conversão</span>';
+  document.getElementById('m-free').textContent=free;
+  document.getElementById('m-bloq').textContent=bloq;
+  document.getElementById('m-mrr').textContent=fR(mrr);
+  document.getElementById('m-arr').textContent=fR(arr);
+}
+
+function renderTabela(users){
+  var tbody=document.getElementById('tabela-usuarios');
+  if(!users.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Nenhum usuário encontrado</td></tr>';return;}
+  tbody.innerHTML=users.map(function(u){
+    var plano=u.plano||'gratuito', status=u.status||'ativo', nome=u.nome||'Sem nome';
+    var dt=u.created_at?new Date(u.created_at).toLocaleDateString('pt-BR'):'—';
+    var proSince=u.pro_since?new Date(u.pro_since).toLocaleDateString('pt-BR'):'—';
+    var av=u.avatar_url?'<img class="user-av" src="'+esc(u.avatar_url)+'" onerror="this.style.display=\'none\'">':'<div class="user-av-ph">'+nome.charAt(0).toUpperCase()+'</div>';
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:8px">'+av+'<span style="font-weight:600">'+esc(nome)+'</span></div></td>'
+      +'<td style="color:var(--t2)">'+esc(u.email||'—')+'</td>'
+      +'<td><span class="badge badge-'+(plano==='pro'?'pro':'free')+'">'+(plano==='pro'?'Pro ✦':'Gratuito')+'</span></td>'
+      +'<td><span class="badge badge-'+(status==='bloqueado'?'bloq':'ativo')+'">'+(status==='bloqueado'?'Bloqueado':'Ativo')+'</span></td>'
+      +'<td style="color:var(--t2);font-size:12px">'+dt+'</td>'
+      +'<td style="color:var(--t2);font-size:12px">'+proSince+'</td>'
+      +'<td><div style="display:flex;gap:5px;flex-wrap:wrap">'
+        +'<button class="btn btn-ghost btn-sm" onclick="editarUser(\''+esc(u.id)+'\')">Editar</button>'
+        +(plano!=='pro'?'<button class="btn btn-green btn-sm" onclick="ativarPro(\''+esc(u.id)+'\',\''+esc(nome)+'\')">✦ Pro</button>':'<button class="btn btn-amber btn-sm" onclick="removerPro(\''+esc(u.id)+'\',\''+esc(nome)+'\')">Remover Pro</button>')
+        +(status==='bloqueado'?'<button class="btn btn-green btn-sm" onclick="toggleBloq(\''+esc(u.id)+'\',\'ativo\',\''+esc(nome)+'\')">Desbloquear</button>':'<button class="btn btn-red btn-sm" onclick="toggleBloq(\''+esc(u.id)+'\',\'bloqueado\',\''+esc(nome)+'\')">Bloquear</button>')
+      +'</div></td></tr>';
+  }).join('');
+}
+
+function filtrarUsuarios(){
+  var busca=(document.getElementById('busca-user').value||'').toLowerCase();
+  var fp=document.getElementById('filtro-plano').value, fs=document.getElementById('filtro-status').value;
+  renderTabela(TODOS.filter(function(u){
+    return (!busca||(u.nome||'').toLowerCase().includes(busca)||(u.email||'').toLowerCase().includes(busca))
+      &&(!fp||(u.plano||'gratuito')===fp)&&(!fs||(u.status||'ativo')===fs);
+  }));
+}
+
+async function ativarPro(id,nome){
+  if(!confirm('Ativar plano Pro para '+nome+'?')) return;
+  var res=await sb.from('profiles').update({plano:'pro',pro_since:new Date().toISOString()}).eq('id',id);
+  if(res.error){toast('Erro: '+res.error.message,'err');return;}
+  var u=TODOS.find(function(u){return u.id===id;}); if(u){u.plano='pro';u.pro_since=new Date().toISOString();}
+  calcularMetricas(); filtrarUsuarios(); toast('✦ '+nome+' agora tem o plano Pro!','ok');
+}
+
+async function removerPro(id,nome){
+  if(!confirm('Remover plano Pro de '+nome+'?')) return;
+  var res=await sb.from('profiles').update({plano:'gratuito',pro_since:null}).eq('id',id);
+  if(res.error){toast('Erro: '+res.error.message,'err');return;}
+  var u=TODOS.find(function(u){return u.id===id;}); if(u){u.plano='gratuito';u.pro_since=null;}
+  calcularMetricas(); filtrarUsuarios(); toast('Plano Pro removido de '+nome,'ok');
+}
+
+async function toggleBloq(id,novoStatus,nome){
+  if(!confirm(novoStatus==='bloqueado'?'Bloquear '+nome+'?':'Desbloquear '+nome+'?')) return;
+  var res=await sb.from('profiles').update({status:novoStatus}).eq('id',id);
+  if(res.error){toast('Erro: '+res.error.message,'err');return;}
+  var u=TODOS.find(function(u){return u.id===id;}); if(u) u.status=novoStatus;
+  calcularMetricas(); filtrarUsuarios(); toast(nome+' '+(novoStatus==='bloqueado'?'bloqueado':'desbloqueado')+'!','ok');
+}
+
+function editarUser(id){
+  var u=TODOS.find(function(u){return u.id===id;}); if(!u) return;
+  document.getElementById('edit-user-id').value=id;
+  document.getElementById('edit-nome').value=u.nome||'';
+  document.getElementById('edit-plano').value=u.plano||'gratuito';
+  document.getElementById('edit-status').value=u.status||'ativo';
+  document.getElementById('edit-obs').value=u.obs_admin||'';
+  document.getElementById('edit-display-nome').textContent=u.nome||'Sem nome';
+  document.getElementById('edit-display-email').textContent=u.email||'—';
+  document.getElementById('edit-av').textContent=(u.nome||'?').charAt(0).toUpperCase();
+  document.getElementById('ov-user').classList.add('on');
+}
+
+async function salvarUsuario(){
+  var id=document.getElementById('edit-user-id').value;
+  var nome=document.getElementById('edit-nome').value.trim();
+  var plano=document.getElementById('edit-plano').value;
+  var status=document.getElementById('edit-status').value;
+  var obs=document.getElementById('edit-obs').value.trim();
+  if(!nome){toast('Informe o nome','err');return;}
+  var upd={nome,plano,status,obs_admin:obs};
+  var u=TODOS.find(function(u){return u.id===id;});
+  if(plano==='pro'&&(!u||u.plano!=='pro')) upd.pro_since=new Date().toISOString();
+  if(plano!=='pro') upd.pro_since=null;
+  var res=await sb.from('profiles').update(upd).eq('id',id);
+  if(res.error){toast('Erro: '+res.error.message,'err');return;}
+  if(u) Object.assign(u,upd);
+  fecharModal(); calcularMetricas(); filtrarUsuarios(); toast('Usuário atualizado!','ok');
+}
+
+function fecharModal(){ document.getElementById('ov-user').classList.remove('on'); }
+
+async function ativarProManual(){
+  var email=(document.getElementById('manual-email').value||'').trim().toLowerCase();
+  var msgEl=document.getElementById('manual-msg');
+  if(!email){msgEl.style.color='var(--coral)';msgEl.textContent='Digite o e-mail';return;}
+  var u=TODOS.find(function(u){return (u.email||'').toLowerCase()===email;});
+  if(!u){msgEl.style.color='var(--coral)';msgEl.textContent='Usuário não encontrado. Ele precisa ter criado conta no Suvita.';return;}
+  if(u.plano==='pro'){msgEl.style.color='var(--teal)';msgEl.textContent='✓ Já tem o plano Pro!';return;}
+  await ativarPro(u.id,u.nome||email);
+  document.getElementById('manual-email').value='';
+  msgEl.style.color='var(--teal)'; msgEl.textContent='✓ Pro ativado para '+email;
+  setTimeout(function(){msgEl.textContent='';},4000);
+}
+
+function renderReceita(){
+  var pro=TODOS.filter(function(u){return u.plano==='pro';}).length;
+  var total=TODOS.length, mrr=pro*19, arr=mrr*12;
+  var conv=total?((pro/total)*100).toFixed(1)+'%':'0%';
+  var bloq=TODOS.filter(function(u){return u.status==='bloqueado';}).length;
+  document.getElementById('rf-mrr').textContent=fR(mrr);
+  document.getElementById('rf-arr').textContent=fR(arr);
+  document.getElementById('rf-pro').textContent=pro+' assinante'+(pro!==1?'s':'');
+  document.getElementById('rf-conv').textContent=conv;
+  document.getElementById('rf-bloq').textContent=bloq;
+
+  var free=total-pro;
+  if(chP) chP.destroy();
+  chP=new Chart(document.getElementById('ch-pizza').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['Pro ✦','Gratuito'],datasets:[{data:[pro,free],backgroundColor:['rgba(79,143,255,.8)','rgba(80,80,122,.35)'],borderWidth:2,borderColor:'#0d1225'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{labels:{color:'#9090b8',font:{size:12}}}}}
+  });
+
+  var meses={};
+  TODOS.filter(function(u){return u.plano==='pro'&&u.pro_since;}).forEach(function(u){
+    var m=u.pro_since.substring(0,7); meses[m]=(meses[m]||0)+1;
+  });
+  var labels=Object.keys(meses).sort().slice(-8);
+  var vals=labels.map(function(m){return meses[m];});
+  var mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  if(chC) chC.destroy();
+  chC=new Chart(document.getElementById('ch-crescimento').getContext('2d'),{
+    type:'bar',
+    data:{labels:labels.map(function(m){var p=m.split('-');return mn[parseInt(p[1])-1]+'/'+p[0].slice(2);}),datasets:[{label:'Novas assinaturas Pro',data:vals,backgroundColor:'rgba(79,143,255,.6)',borderColor:'#4f8fff',borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9090b8'}}},scales:{x:{ticks:{color:'#50507a'}},y:{ticks:{color:'#50507a',stepSize:1},beginAtZero:true}}}
+  });
+
+  var ultimas=TODOS.filter(function(u){return u.plano==='pro'&&u.pro_since;})
+    .sort(function(a,b){return new Date(b.pro_since)-new Date(a.pro_since);}).slice(0,8);
+  document.getElementById('ultimas-ativacoes').innerHTML=ultimas.length?ultimas.map(function(u){
+    var dt=new Date(u.pro_since).toLocaleDateString('pt-BR');
+    return '<div style="display:flex;align-items:center;gap:10px">'
+      +'<div class="user-av-ph" style="width:28px;height:28px;font-size:10px">'+(u.nome||'?').charAt(0).toUpperCase()+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(u.nome||'Sem nome')+'</div>'
+      +'<div style="font-size:11px;color:var(--t3)">'+esc(u.email||'')+'</div></div>'
+      +'<span class="badge badge-pro">Pro ✦</span>'
+      +'<span style="font-size:11px;color:var(--t3)">'+dt+'</span></div>';
+  }).join(''):'<div style="color:var(--t3);font-size:13px">Nenhuma assinatura ainda</div>';
+}
+
+function copiarWebhook(){ navigator.clipboard.writeText('https://frvjcwixaftjahrkszqy.supabase.co/functions/v1/kiwify-webhook').then(function(){toast('URL copiada!','ok');}); }
+function copiarFuncao(){ navigator.clipboard.writeText(document.getElementById('edge-fn-code').innerText).then(function(){toast('Código copiado!','ok');}); }
+
+function exportarCSV(){
+  if(!TODOS.length){toast('Nenhum dado para exportar','err');return;}
+  var cols=['nome','email','plano','status','created_at','pro_since','obs_admin'];
+  var csv='﻿'+cols.join(',')+'\n'+TODOS.map(function(u){
+    return cols.map(function(c){return '"'+String(u[c]||'').replace(/"/g,'""')+'"';}).join(',');
+  }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='suvita_usuarios_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); toast('CSV exportado!','ok');
+}
+
+document.querySelectorAll('.ov').forEach(function(o){ o.addEventListener('click',function(e){if(e.target===o)fecharModal();}); });
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharModal();});
+
+window.addEventListener('DOMContentLoaded',async function(){
+  await new Promise(function(r){setTimeout(r,400);});
+  if(!initSb()) return;
+  var s=await sb.auth.getSession();
+  if(s.data&&s.data.session&&s.data.session.user.email===ADMIN_EMAIL){
+    CURRENT_USER=s.data.session.user; mostrarApp();
+  }
+});
+</script>
+</body>
+</html>
