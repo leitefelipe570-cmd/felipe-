@@ -281,6 +281,36 @@ table.sh{width:100%;border-collapse:collapse;min-width:460px}
 .ext-legend-val{font-size:11px;color:var(--t2);min-width:70px;text-align:right}
 .ext-sel-all{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;user-select:none}
 
+/* ── RELATÓRIO EXTRATO ────────────────────────── */
+.rlt-ano{margin-bottom:20px}
+.rlt-ano-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,var(--s3),var(--s2));border-radius:var(--r2);margin-bottom:10px;cursor:pointer;user-select:none;border:1px solid var(--b0)}
+.rlt-ano-head:hover{border-color:var(--b1)}
+.rlt-ano-lbl{font-size:15px;font-weight:800;font-family:var(--fHead);font-style:italic}
+.rlt-ano-sum{display:flex;gap:16px;flex-shrink:0}
+.rlt-ano-sum span{font-size:11px;font-weight:700}
+.rlt-mes{margin-bottom:12px;border:1px solid var(--b0);border-radius:var(--r2);overflow:hidden}
+.rlt-mes-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s2);cursor:pointer;user-select:none}
+.rlt-mes-head:hover{background:var(--s3)}
+.rlt-mes-lbl{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.rlt-mes-stats{display:flex;gap:12px;font-size:11px}
+.rlt-trans-list{display:none}
+.rlt-trans-list.open{display:block}
+.rlt-trans-item{display:grid;grid-template-columns:90px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--b0);font-size:12px;transition:background .12s}
+.rlt-trans-item:last-child{border-bottom:none}
+.rlt-trans-item:hover{background:rgba(255,255,255,.025)}
+.rlt-date{color:var(--t3);font-size:11px;font-weight:600}
+.rlt-desc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlt-desc-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.rlt-val-pos{color:var(--teal);font-weight:700;text-align:right;white-space:nowrap}
+.rlt-val-neg{color:var(--coral);font-weight:700;text-align:right;white-space:nowrap}
+.rlt-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+.rb-entrada{background:rgba(56,217,169,.1);color:var(--teal);border:1px solid rgba(56,217,169,.2)}
+.rb-saida{background:rgba(255,107,107,.1);color:var(--coral);border:1px solid rgba(255,107,107,.15)}
+.rb-poupanca{background:rgba(159,122,234,.1);color:var(--purple);border:1px solid rgba(159,122,234,.2)}
+.rb-divida{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
+.rlt-mes-footer{padding:10px 14px;background:rgba(255,255,255,.02);display:flex;justify-content:space-between;font-size:11px;border-top:1px solid var(--b0)}
+.rlt-empty{padding:24px;text-align:center;color:var(--t3);font-size:13px}
+
 /* ── MODAL ────────────────────────────────────── */
 .ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);align-items:flex-end;justify-content:center;padding:0}
 @media(min-width:600px){.ov{align-items:center;padding:20px}}
@@ -977,9 +1007,15 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
   <div id="ext-input-area">
     <div class="ext-drop" id="ext-drop" onclick="document.getElementById('ext-file-in').click()" ondragover="extDrag(event,true)" ondragleave="extDrag(event,false)" ondrop="extDropFile(event)">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
-      <p>Arraste um arquivo <strong>CSV / OFX / TXT</strong> ou clique para selecionar</p>
-      <small>Também aceita texto colado de qualquer extrato bancário</small>
-      <input type="file" id="ext-file-in" accept=".csv,.ofx,.txt,.qfx" style="display:none" onchange="extLoadFile(this)">
+      <p>Arraste um arquivo <strong>CSV / OFX / TXT / PDF</strong> ou clique para selecionar</p>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.2)">CSV</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(91,138,245,.12);color:var(--blue);border:1px solid rgba(91,138,245,.2)">OFX</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(56,217,169,.12);color:var(--teal);border:1px solid rgba(56,217,169,.2)">TXT</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,107,107,.12);color:var(--coral);border:1px solid rgba(255,107,107,.2)">PDF</span>
+      </div>
+      <small style="display:block;margin-top:6px">Nubank, Itaú, Bradesco, C6, Inter, BB e outros</small>
+      <input type="file" id="ext-file-in" accept=".csv,.ofx,.txt,.qfx,.pdf" style="display:none" onchange="extLoadFile(this)">
     </div>
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -1031,12 +1067,29 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
       </div>
     </div>
 
-    <!-- BOTÃO IMPORTAR -->
-    <button class="btn btn-gold" style="width:100%;margin-top:4px" onclick="extImportarSelecionados()">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
-      Importar transações selecionadas para Finanças
-    </button>
-    <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="extReset()">Novo extrato</button>
+    <!-- RELATÓRIO DETALHADO POR ANO -->
+    <div class="ext-section" style="margin-top:14px">
+      <div class="ext-section-head">
+        <span class="ext-section-lbl">📋 Relatório detalhado por ano</span>
+        <button class="btn btn-ghost btn-sm" onclick="extExportarPDF()" id="btn-export-pdf">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2h7l3 3v9H2V2z"/><path d="M9 2v4h3"/><path d="M4 8h6M4 10h4"/></svg>
+          Exportar PDF
+        </button>
+      </div>
+      <div id="ext-relatorio"></div>
+    </div>
+
+    <!-- BOTÕES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn btn-gold" onclick="extImportarSelecionados()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+        Importar para Finanças
+      </button>
+      <button class="btn btn-ghost" onclick="extReset()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7A6 6 0 1 1 7 13M1 7V3M1 7H5"/></svg>
+        Novo extrato
+      </button>
+    </div>
   </div>
 </div>
 
@@ -3751,17 +3804,7 @@ function extProcessar(){
   extRenderResultado();
 }
 
-/* ── Carregar arquivo ── */
-function extLoadFile(input){
-  var file = input.files[0];
-  if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    document.getElementById('ext-paste').value = e.target.result;
-    extProcessar();
-  };
-  reader.readAsText(file,'utf-8');
-}
+/* extLoadFile — definida abaixo com suporte a PDF */
 
 /* ── Drag & drop ── */
 function extDrag(e,enter){ e.preventDefault(); document.getElementById('ext-drop').classList[enter?'add':'remove']('drag'); }
@@ -3857,6 +3900,9 @@ function extRenderResultado(){
       +'<td style="text-align:right;font-weight:700;color:'+color+';white-space:nowrap">'+signal+'R$ '+r.val.toFixed(2)+'</td>'
       +'</tr>';
   }).join('');
+
+  /* Renderizar relatório detalhado */
+  extRenderRelatorio();
 }
 
 /* ── Alterar categoria manualmente ── */
@@ -3914,6 +3960,277 @@ function extShowMsg(msg){
   if(!el) return;
   el.textContent=msg;
   el.style.display=msg?'block':'none';
+}
+
+/* ── Parser PDF (extrai texto via FileReader + regex) ── */
+function extLoadFilePDF(file){
+  /* PDFs simples: tentar ler como texto (funciona em PDFs não criptografados/texto) */
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var text = e.target.result || '';
+    /* Limpar caracteres especiais de PDF */
+    text = text.replace(/\x00/g,' ').replace(/[^\x20-\x7E\xA0-\xFF\n\r]/g,' ');
+    if(text.trim().length < 20){
+      extShowMsg('PDF com conteúdo protegido ou escaneado. Copie o texto manualmente e cole abaixo.');
+      return;
+    }
+    document.getElementById('ext-paste').value = text;
+    extProcessar();
+  };
+  reader.onerror = function(){
+    extShowMsg('Erro ao ler o PDF. Tente copiar o texto do PDF e colar no campo abaixo.');
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+/* ── Carregar arquivo (atualizado para suportar PDF) ── */
+function extLoadFile(input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf'){
+    extLoadFilePDF(file);
+  } else {
+    var reader = new FileReader();
+    reader.onload = function(e){
+      document.getElementById('ext-paste').value = e.target.result;
+      extProcessar();
+    };
+    reader.readAsText(file,'utf-8');
+  }
+}
+
+/* ── Meses em português ── */
+var EXT_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+/* ── Render Relatório Detalhado por Ano ── */
+function extRenderRelatorio(){
+  var el = document.getElementById('ext-relatorio');
+  if(!el || !EXT_ROWS.length){
+    if(el) el.innerHTML = '<div class="rlt-empty">Nenhuma transação para exibir no relatório.</div>';
+    return;
+  }
+
+  /* Agrupar por ano → mês */
+  var porAno = {};
+  EXT_ROWS.forEach(function(r){
+    var parts = (r.data||'').split('-');
+    var ano = parts[0] || 'Desconhecido';
+    var mes = parts[1] ? parseInt(parts[1])-1 : 0;
+    if(!porAno[ano]) porAno[ano] = {};
+    if(!porAno[ano][mes]) porAno[ano][mes] = [];
+    porAno[ano][mes].push(r);
+  });
+
+  var anos = Object.keys(porAno).sort(function(a,b){ return b-a; });
+  var TL3={entrada:'Entrada',saida:'Saída',poupanca:'Poupança',divida:'Dívida'};
+  var RB={entrada:'rb-entrada',saida:'rb-saida',poupanca:'rb-poupanca',divida:'rb-divida'};
+
+  el.innerHTML = anos.map(function(ano, anoIdx){
+    var meses = porAno[ano];
+    var mesKeys = Object.keys(meses).sort(function(a,b){ return a-b; });
+
+    /* Totais do ano */
+    var anoEnt=0, anoSai=0, anoTotal=0;
+    mesKeys.forEach(function(m){
+      meses[m].forEach(function(r){
+        anoTotal++;
+        if(r.tipo==='entrada') anoEnt+=r.val;
+        else anoSai+=r.val;
+      });
+    });
+    var anoSaldo = anoEnt - anoSai;
+
+    var mesHtml = mesKeys.map(function(m, mIdx){
+      var rows = meses[m];
+      var mesEnt=0, mesSai=0;
+      rows.forEach(function(r){
+        if(r.tipo==='entrada') mesEnt+=r.val;
+        else mesSai+=r.val;
+      });
+      var mesSaldo = mesEnt - mesSai;
+      var mesId = 'rlt-mes-'+ano+'-'+m;
+
+      var transHtml = rows.map(function(r){
+        var parts = (r.data||'').split('-');
+        var dia = parts[2] || '??';
+        var isPos = r.tipo==='entrada';
+        var dtLabel = dia+'/'+(parts[1]||'??');
+        /* Extrair "quem pagou / origem" da descrição */
+        var partes = r.desc ? r.desc.split(/\s+/) : [];
+        var origem = partes.length > 2 ? partes.slice(0,3).join(' ') : r.desc || '—';
+
+        return '<div class="rlt-trans-item">'
+          +'<div class="rlt-date">'+dtLabel+' ('+['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(r.data).getDay()]+')</div>'
+          +'<div><div class="rlt-desc">'+esc(r.desc||'Transação')+'</div>'
+          +'<div class="rlt-desc-sub">'+esc(r.cat||'outro')+(origem&&origem!==r.desc?' · '+esc(origem):'')+'</div></div>'
+          +'<span class="rlt-badge '+(RB[r.tipo]||'rb-saida')+'">'+(TL3[r.tipo]||r.tipo)+'</span>'
+          +'<div class="'+(isPos?'rlt-val-pos':'rlt-val-neg')+'">'+(isPos?'+':'-')+fR(r.val||0)+'</div>'
+        +'</div>';
+      }).join('');
+
+      return '<div class="rlt-mes">'
+        +'<div class="rlt-mes-head" onclick="extToggleMes(\''+mesId+'\')">'
+          +'<div class="rlt-mes-lbl">'
+            +'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2v4M13 2v4"/></svg>'
+            +EXT_MESES[parseInt(m)]+' '+ano+' <span style="color:var(--t3);font-size:11px">('+rows.length+' lançamentos)</span>'
+          +'</div>'
+          +'<div class="rlt-mes-stats">'
+            +'<span style="color:var(--teal)">+'+fR(mesEnt)+'</span>'
+            +'<span style="color:var(--coral)">-'+fR(mesSai)+'</span>'
+            +'<span style="color:'+(mesSaldo>=0?'var(--gold)':'var(--coral)')+'">= '+fR(mesSaldo)+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div class="rlt-trans-list'+(mIdx===0&&anoIdx===0?' open':'')+'" id="'+mesId+'">'
+          +transHtml
+          +'<div class="rlt-mes-footer">'
+            +'<span>📥 Entradas: <strong style="color:var(--teal)">'+fR(mesEnt)+'</strong></span>'
+            +'<span>📤 Saídas: <strong style="color:var(--coral)">'+fR(mesSai)+'</strong></span>'
+            +'<span>💰 Saldo: <strong style="color:'+(mesSaldo>=0?'var(--gold)':'var(--coral)')+'">'+fR(mesSaldo)+'</strong></span>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+
+    return '<div class="rlt-ano">'
+      +'<div class="rlt-ano-head" onclick="extToggleAno(\'rlt-ano-body-'+anoIdx+'\')">'
+        +'<div class="rlt-ano-lbl">📅 '+ano+'</div>'
+        +'<div class="rlt-ano-sum">'
+          +'<span style="color:var(--teal)">+'+fR(anoEnt)+'</span>'
+          +'<span style="color:var(--coral)">-'+fR(anoSai)+'</span>'
+          +'<span style="color:'+(anoSaldo>=0?'var(--gold)':'var(--coral)')+'">Saldo '+fR(anoSaldo)+'</span>'
+          +'<span style="color:var(--t3)">'+anoTotal+' transações</span>'
+        +'</div>'
+      +'</div>'
+      +'<div id="rlt-ano-body-'+anoIdx+'">'+mesHtml+'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function extToggleMes(id){
+  var el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+function extToggleAno(id){
+  var el = document.getElementById(id);
+  if(el) el.style.display = el.style.display==='none' ? '' : 'none';
+}
+
+/* ── Exportar relatório como PDF (via print) ── */
+function extExportarPDF(){
+  if(!EXT_ROWS.length){ toast('Nenhum dado para exportar','err'); return; }
+
+  var TL3={entrada:'Entrada',saida:'Saída',poupanca:'Poupança',divida:'Dívida'};
+
+  /* Agrupar por ano → mês */
+  var porAno = {};
+  EXT_ROWS.forEach(function(r){
+    var parts=(r.data||'').split('-');
+    var ano=parts[0]||'Desconhecido', mes=parts[1]?parseInt(parts[1])-1:0;
+    if(!porAno[ano]) porAno[ano]={};
+    if(!porAno[ano][mes]) porAno[ano][mes]=[];
+    porAno[ano][mes].push(r);
+  });
+
+  var anos = Object.keys(porAno).sort(function(a,b){return b-a;});
+
+  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    +'<title>Relatório de Extrato — Suvita</title>'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:Inter,sans-serif;font-size:12px;color:#111;background:#fff;padding:32px}'
+    +'.header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #f5a623;padding-bottom:16px;margin-bottom:24px}'
+    +'.logo{font-size:26px;font-weight:800;color:#f5a623}'
+    +'.meta{text-align:right;font-size:11px;color:#666}'
+    +'.ano-bloco{margin-bottom:28px;page-break-inside:avoid}'
+    +'.ano-titulo{background:linear-gradient(90deg,#f5a623,#ffc55e);color:#000;font-size:16px;font-weight:800;padding:10px 16px;border-radius:8px 8px 0 0}'
+    +'.ano-resumo{background:#fff8ee;border:1px solid #fde68a;padding:10px 16px;display:flex;gap:24px;font-size:12px;border-radius:0 0 4px 4px;margin-bottom:12px}'
+    +'.mes-bloco{margin-bottom:16px;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden}'
+    +'.mes-titulo{background:#f9fafb;padding:8px 14px;font-weight:700;font-size:13px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'thead th{background:#f3f4f6;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;text-align:left;border-bottom:1px solid #e5e7eb}'
+    +'tbody td{padding:7px 10px;border-bottom:1px solid #f3f4f6;vertical-align:middle}'
+    +'tbody tr:last-child td{border-bottom:none}'
+    +'tbody tr:hover{background:#fafafa}'
+    +'.pos{color:#059669;font-weight:700}'
+    +'.neg{color:#dc2626;font-weight:700}'
+    +'.badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase}'
+    +'.b-entrada{background:#d1fae5;color:#065f46}'
+    +'.b-saida{background:#fee2e2;color:#991b1b}'
+    +'.b-poupanca{background:#ede9fe;color:#5b21b6}'
+    +'.b-divida{background:#fef3c7;color:#92400e}'
+    +'.mes-footer{background:#f9fafb;padding:8px 14px;display:flex;gap:20px;font-size:11px;border-top:1px solid #e5e7eb;font-weight:600}'
+    +'@media print{.no-print{display:none}}'
+    +'</style></head><body>'
+    +'<div class="header">'
+      +'<div><div class="logo">Suvita</div><div style="font-size:12px;color:#666;margin-top:2px">Relatório de Extrato Bancário</div></div>'
+      +'<div class="meta"><div><strong>Gerado em:</strong> '+new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR')+'</div>'
+      +'<div><strong>Total de transações:</strong> '+EXT_ROWS.length+'</div></div>'
+    +'</div>';
+
+  anos.forEach(function(ano){
+    var meses=porAno[ano], mesKeys=Object.keys(meses).sort(function(a,b){return a-b;});
+    var anoEnt=0,anoSai=0,anoTotal=0;
+    mesKeys.forEach(function(m){ meses[m].forEach(function(r){ anoTotal++; if(r.tipo==='entrada')anoEnt+=r.val; else anoSai+=r.val; }); });
+    var anoSaldo=anoEnt-anoSai;
+
+    html+='<div class="ano-bloco">'
+      +'<div class="ano-titulo">📅 '+ano+'</div>'
+      +'<div class="ano-resumo">'
+        +'<span>📥 Entradas: <strong style="color:#059669">'+fR(anoEnt)+'</strong></span>'
+        +'<span>📤 Saídas: <strong style="color:#dc2626">'+fR(anoSai)+'</strong></span>'
+        +'<span>💰 Saldo: <strong style="color:'+(anoSaldo>=0?'#059669':'#dc2626')+'">'+fR(anoSaldo)+'</strong></span>'
+        +'<span>🔢 Transações: <strong>'+anoTotal+'</strong></span>'
+      +'</div>';
+
+    mesKeys.forEach(function(m){
+      var rows=meses[m], mesEnt=0, mesSai=0;
+      rows.forEach(function(r){ if(r.tipo==='entrada')mesEnt+=r.val; else mesSai+=r.val; });
+      var mesSaldo=mesEnt-mesSai;
+
+      html+='<div class="mes-bloco">'
+        +'<div class="mes-titulo"><span>'+EXT_MESES[parseInt(m)]+' '+ano+' &nbsp;<span style="color:#6b7280;font-weight:400;font-size:11px">('+rows.length+' lançamentos)</span></span>'
+        +'<span>Saldo: <span style="color:'+(mesSaldo>=0?'#059669':'#dc2626')+'">'+fR(mesSaldo)+'</span></span></div>'
+        +'<table><thead><tr><th>Data</th><th>Dia</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead><tbody>';
+
+      rows.forEach(function(r){
+        var parts=(r.data||'').split('-');
+        var dt=parts[2]+'/'+parts[1]+'/'+parts[0];
+        var diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+        var diaNome=r.data?diasSem[new Date(r.data).getDay()]:'—';
+        var isPos=r.tipo==='entrada';
+        var badgeClass={'entrada':'b-entrada','saida':'b-saida','poupanca':'b-poupanca','divida':'b-divida'}[r.tipo]||'b-saida';
+
+        html+='<tr>'
+          +'<td>'+dt+'</td>'
+          +'<td>'+diaNome+'</td>'
+          +'<td><strong>'+esc(r.desc||'Transação')+'</strong></td>'
+          +'<td>'+esc(r.cat||'outro')+'</td>'
+          +'<td><span class="badge '+badgeClass+'">'+(TL3[r.tipo]||r.tipo)+'</span></td>'
+          +'<td style="text-align:right" class="'+(isPos?'pos':'neg')+'">'+(isPos?'+':'-')+fR(r.val||0)+'</td>'
+        +'</tr>';
+      });
+
+      html+='</tbody></table>'
+        +'<div class="mes-footer">'
+          +'<span>📥 Entradas: <span style="color:#059669">'+fR(mesEnt)+'</span></span>'
+          +'<span>📤 Saídas: <span style="color:#dc2626">'+fR(mesSai)+'</span></span>'
+          +'<span>💰 Saldo do mês: <span style="color:'+(mesSaldo>=0?'#059669':'#dc2626')+'">'+fR(mesSaldo)+'</span></span>'
+        +'</div>'
+      +'</div>';
+    });
+
+    html+='</div>';
+  });
+
+  html+='</body></html>';
+
+  var w = window.open('','_blank');
+  if(!w){ toast('Permita popups para exportar o PDF','err'); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ w.print(); }, 600);
+  toast('Relatório aberto — use Ctrl+P para salvar como PDF!','ok');
 }
 
 /* ══════════════════════════════════════
