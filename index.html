@@ -338,6 +338,60 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--s4);border:1px solid var(--b1);border-radius:12px;padding:11px 20px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:all .26s var(--ease);pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ══ LIVE DASHBOARD ══════════════════════════════ */
+.ld-hero{background:linear-gradient(135deg,#0d0f24,#151830);border:1px solid rgba(139,92,246,.18);border-radius:var(--r);padding:28px 28px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.ld-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 65%);pointer-events:none}
+.ld-hero::after{content:'';position:absolute;bottom:-40px;left:60px;width:180px;height:180px;background:radial-gradient(circle,rgba(79,143,255,.09),transparent 65%);pointer-events:none}
+.ld-title{font-family:var(--fHead);font-size:26px;font-style:italic;background:linear-gradient(90deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.ld-sub{font-size:13px;color:var(--t2)}
+.ld-live-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#4ade80;margin-top:10px}
+.ld-live-ping{position:relative;width:8px;height:8px}
+.ld-live-ping span:first-child{position:absolute;inset:0;border-radius:50%;background:#4ade80;opacity:.75;animation:livePing 1.2s ease-in-out infinite}
+.ld-live-ping span:last-child{position:absolute;inset:1px;border-radius:50%;background:#4ade80}
+@keyframes livePing{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.8);opacity:0}}
+
+.ld-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.ld-metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.ld-metrics{grid-template-columns:1fr 1fr}}
+
+.ld-met{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:18px 20px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+.ld-met:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px)}
+.ld-met::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
+.ld-met.c-purple::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.ld-met.c-blue::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.ld-met.c-green::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.ld-met.c-gold::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.ld-met-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ld-met-val{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1}
+.ld-met-sub{font-size:11px;color:var(--t3);margin-top:5px}
+.ld-met-trend{font-size:11px;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:3px}
+.trend-up{color:#4ade80}.trend-dn{color:#f87171}
+
+.ld-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:900px){.ld-charts{grid-template-columns:1fr}}
+.ld-chart-card{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:20px;transition:border-color .2s}
+.ld-chart-card:hover{border-color:rgba(139,92,246,.2)}
+.ld-chart-ttl{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ld-chart-ttl svg{color:#8b5cf6}
+.ld-chart-wrap{position:relative;height:200px}
+
+.ld-payments{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);overflow:hidden}
+.ld-pay-head{padding:16px 20px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between}
+.ld-pay-ttl{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ld-pay-list{max-height:280px;overflow-y:auto}
+.ld-pay-item{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--b0);transition:background .15s;animation:payIn .3s var(--ease)}
+@keyframes payIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.ld-pay-item:last-child{border-bottom:none}
+.ld-pay-item:hover{background:rgba(255,255,255,.02)}
+.ld-pay-amt{font-size:16px;font-weight:800;color:#4ade80}
+.ld-pay-amt.neg{color:#f87171}
+.ld-pay-desc{font-size:12px;color:var(--t2);margin-top:2px}
+.ld-pay-time{font-size:11px;color:var(--t3)}
+.ld-pay-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase}
+.pb-entrada{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+.pb-saida{background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.15)}
+.pb-poupanca{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2)}
+
 /* ── BOTTOM NAV ───────────────────────────────── */
 .bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(14,15,28,.96);backdrop-filter:blur(16px);border-top:1px solid var(--b0);z-index:200;padding:8px 4px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
 .bnav-inner::-webkit-scrollbar{display:none}
@@ -518,6 +572,11 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
     <div class="ni" onclick="go('extrato')">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h3"/><circle cx="15.5" cy="14.5" r="3.5" fill="var(--bg)" stroke="currentColor"/><path d="M14 14.5h3M15.5 13v3"/></svg>
       <span>Extrato</span>
+    </div>
+    <div class="ni" onclick="go('live')">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M5.5 5.5a6.5 6.5 0 0 0 0 9M14.5 5.5a6.5 6.5 0 0 1 0 9"/><path d="M3 3a10 10 0 0 0 0 14M17 3a10 10 0 0 1 0 14"/></svg>
+      <span>Live</span>
+      <div class="ni-dot show" id="nd-live" style="background:#4ade80"></div>
     </div>
     <div class="sb-sec">Conta</div>
     <div class="ni" onclick="go('planos')">
@@ -978,6 +1037,94 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
       Importar transações selecionadas para Finanças
     </button>
     <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="extReset()">Novo extrato</button>
+  </div>
+</div>
+
+<div class="pg" id="pg-live">
+  <!-- HERO -->
+  <div class="ld-hero">
+    <div>
+      <div class="ld-title">Active Sales Tracker</div>
+      <div class="ld-sub">Visão em tempo real das suas finanças</div>
+      <div class="ld-live-dot">
+        <div class="ld-live-ping"><span></span><span></span></div>
+        Transmitindo ao vivo
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:11px;color:var(--t3);margin-bottom:4px">Última atualização</div>
+      <div id="ld-last-update" style="font-size:13px;font-weight:700;color:#a78bfa">—</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:8px">Atualiza a cada 3s</div>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div class="ld-metrics">
+    <div class="ld-met c-green">
+      <div class="ld-met-lbl">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v14M3 10h14"/></svg>
+        Receita total
+      </div>
+      <div class="ld-met-val" id="ld-receita" style="color:#4ade80">R$ 0,00</div>
+      <div class="ld-met-sub">Entradas do período</div>
+    </div>
+    <div class="ld-met c-purple">
+      <div class="ld-met-lbl">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="16" height="11" rx="2"/><path d="M1 10h18"/></svg>
+        Transações
+      </div>
+      <div class="ld-met-val" id="ld-total-trans" style="color:#a78bfa">0</div>
+      <div class="ld-met-sub">Total de lançamentos</div>
+    </div>
+    <div class="ld-met c-blue">
+      <div class="ld-met-lbl">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17V7m4 10V3m4 14v-6m4 6v-4"/></svg>
+        Ticket médio
+      </div>
+      <div class="ld-met-val" id="ld-ticket" style="color:#60a5fa">R$ 0,00</div>
+      <div class="ld-met-sub">Valor médio por transação</div>
+    </div>
+    <div class="ld-met c-gold">
+      <div class="ld-met-lbl">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15V5M6 9l4-4 4 4"/><path d="M3 17h14"/></svg>
+        Saldo atual
+      </div>
+      <div class="ld-met-val" id="ld-saldo">R$ 0,00</div>
+      <div class="ld-met-sub">Entradas - Saídas</div>
+      <div class="ld-met-trend" id="ld-saldo-trend"></div>
+    </div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="ld-charts">
+    <div class="ld-chart-card">
+      <div class="ld-chart-ttl">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17V7m4 10V3m4 14v-6m4 6v-4"/></svg>
+        Entradas por dia
+      </div>
+      <div class="ld-chart-wrap"><canvas id="ld-ch-entradas"></canvas></div>
+    </div>
+    <div class="ld-chart-card">
+      <div class="ld-chart-ttl">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l14 14M10 3c3.9 0 7 3.1 7 7M3 10c0-2.1.9-4 2.3-5.3"/></svg>
+        Saídas por categoria
+      </div>
+      <div class="ld-chart-wrap"><canvas id="ld-ch-saidas"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ÚLTIMAS TRANSAÇÕES -->
+  <div class="ld-payments">
+    <div class="ld-pay-head">
+      <div class="ld-pay-ttl">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="11" rx="2"/><path d="M1 10h18"/></svg>
+        Últimos lançamentos
+      </div>
+      <span style="font-size:11px;color:var(--t3)">10 mais recentes</span>
+    </div>
+    <div class="ld-pay-list" id="ld-pay-list">
+      <div style="text-align:center;padding:30px;color:var(--t3);font-size:13px">Nenhum lançamento ainda...</div>
+    </div>
   </div>
 </div>
 
@@ -1918,7 +2065,7 @@ var DL={todos:'Todos os dias',semana:'Dias úteis',fim:'Fim de semana',unico:'Um
 
 /* NAVIGATION */
 var CUR='dash';
-var NM={dash:0,metas:1,tarefas:2,rotina:3,financeiro:4,planilha:5,analitico:6,extrato:7,historico:8,planos:9};
+var NM={dash:0,metas:1,tarefas:2,rotina:3,financeiro:4,planilha:5,analitico:6,extrato:7,live:8,historico:9,planos:10};
 var BM={dash:0,metas:1,tarefas:2,financeiro:3,planilha:4,analitico:5,extrato:6,planos:7,auth:8};
 
 function go(id){
@@ -1939,6 +2086,7 @@ function go(id){
   else if(id==='planilha'){renderShTabs();renderShAtiva();}
   else if(id==='analitico'){renderAnalitico();}
   else if(id==='extrato'){/* extrato is self-contained */}
+  else if(id==='live'){renderLive();}
   else if(id==='historico'){renderHistorico();}
 }
 
@@ -3766,6 +3914,177 @@ function extShowMsg(msg){
   if(!el) return;
   el.textContent=msg;
   el.style.display=msg?'block':'none';
+}
+
+/* ══════════════════════════════════════
+   LIVE SALES DASHBOARD
+══════════════════════════════════════ */
+var LD_INTERVAL = null;
+var LD_CH_ENT   = null;
+var LD_CH_SAI   = null;
+var LD_PREV_SALDO = 0;
+
+function renderLive(){
+  ldAtualizar();
+  if(LD_INTERVAL) clearInterval(LD_INTERVAL);
+  LD_INTERVAL = setInterval(ldAtualizar, 3000);
+}
+
+function ldAtualizar(){
+  var trans = D.trans || [];
+  if(!trans.length){
+    ldAtualizarUI({receita:0,saida:0,poupanca:0,divida:0,total:0,ticket:0,saldo:0,ultimas:[],porCat:{},porDia:{}});
+    return;
+  }
+
+  /* Calcular métricas */
+  var receita=0, saida=0, poupanca=0, divida=0;
+  var porCat={}, porDia={};
+  trans.forEach(function(t){
+    var v = t.val||0;
+    if(t.tipo==='entrada')      receita+=v;
+    else if(t.tipo==='saida')   saida+=v;
+    else if(t.tipo==='poupanca')poupanca+=v;
+    else if(t.tipo==='divida')  divida+=v;
+
+    /* Por categoria (saídas) */
+    if(t.tipo==='saida'){
+      var cat=t.cat||'outro';
+      porCat[cat]=(porCat[cat]||0)+v;
+    }
+
+    /* Por dia (entradas) */
+    if(t.tipo==='entrada' && t.data){
+      var dia=t.data;
+      porDia[dia]=(porDia[dia]||0)+v;
+    }
+  });
+
+  var saldo    = receita - saida - poupanca - divida;
+  var total    = trans.length;
+  var ticket   = total ? (receita+saida+poupanca+divida)/total : 0;
+  var ultimas  = trans.slice(0,10);
+
+  ldAtualizarUI({receita,saida,poupanca,divida,total,ticket,saldo,ultimas,porCat,porDia});
+
+  /* Timestamp */
+  var now = new Date();
+  var el = document.getElementById('ld-last-update');
+  if(el) el.textContent = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+}
+
+function ldAtualizarUI(d){
+  /* Cards */
+  var elR = document.getElementById('ld-receita');
+  var elT = document.getElementById('ld-total-trans');
+  var elTk= document.getElementById('ld-ticket');
+  var elS = document.getElementById('ld-saldo');
+  var elSt= document.getElementById('ld-saldo-trend');
+
+  if(elR)  elR.textContent  = fR(d.receita);
+  if(elT)  elT.textContent  = d.total;
+  if(elTk) elTk.textContent = fR(d.ticket);
+  if(elS){
+    elS.textContent = fR(d.saldo);
+    elS.style.color = d.saldo >= 0 ? '#4ade80' : '#f87171';
+  }
+  if(elSt){
+    var diff = d.saldo - LD_PREV_SALDO;
+    if(diff>0)      elSt.innerHTML='<span class="trend-up">▲ +'+fR(diff)+'</span>';
+    else if(diff<0) elSt.innerHTML='<span class="trend-dn">▼ '+fR(diff)+'</span>';
+    else            elSt.innerHTML='';
+  }
+  LD_PREV_SALDO = d.saldo;
+
+  /* Gráfico entradas por dia */
+  var diasKeys = Object.keys(d.porDia).sort().slice(-10);
+  var diasVals = diasKeys.map(function(k){ return d.porDia[k]; });
+  var diasLabels = diasKeys.map(function(k){
+    var p=k.split('-'); return (p[2]||k)+'/'+(p[1]||'');
+  });
+
+  if(LD_CH_ENT) LD_CH_ENT.destroy();
+  var c1 = document.getElementById('ld-ch-entradas');
+  if(c1 && diasKeys.length){
+    LD_CH_ENT = new Chart(c1.getContext('2d'),{
+      type:'line',
+      data:{
+        labels: diasLabels,
+        datasets:[{
+          label:'Entradas',
+          data: diasVals,
+          borderColor:'#4ade80',
+          backgroundColor:'rgba(74,222,128,.1)',
+          borderWidth:2,
+          pointRadius:3,
+          pointBackgroundColor:'#4ade80',
+          fill:true,
+          tension:.4
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return ' '+fR(c.raw);}}}},
+        scales:{
+          x:{ticks:{color:'#46456a',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+          y:{ticks:{color:'#46456a',font:{size:10},callback:function(v){return 'R$'+v;}},grid:{color:'rgba(255,255,255,.04)'}}
+        }
+      }
+    });
+  } else if(c1 && !diasKeys.length){
+    LD_CH_ENT = new Chart(c1.getContext('2d'),{type:'line',data:{labels:['Sem dados'],datasets:[{data:[0],borderColor:'#4ade80',borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  }
+
+  /* Gráfico saídas por categoria */
+  var catKeys = Object.keys(d.porCat);
+  var catVals = catKeys.map(function(k){ return d.porCat[k]; });
+  var catColors = catKeys.map(function(k){
+    var m={'alimentacao':'#f59e0b','transporte':'#3b82f6','moradia':'#8b5cf6','saude':'#10b981','lazer':'#f97316','compras':'#ec4899','servicos':'#6b7280','educacao':'#06b6d4','outro':'#9ca3af'};
+    return m[k]||'#9ca3af';
+  });
+
+  if(LD_CH_SAI) LD_CH_SAI.destroy();
+  var c2 = document.getElementById('ld-ch-saidas');
+  if(c2 && catKeys.length){
+    LD_CH_SAI = new Chart(c2.getContext('2d'),{
+      type:'doughnut',
+      data:{labels:catKeys,datasets:[{data:catVals,backgroundColor:catColors,borderWidth:2,borderColor:'#0e0f1c'}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'62%',
+        plugins:{
+          legend:{labels:{color:'#9896b5',font:{size:11},boxWidth:10}},
+          tooltip:{callbacks:{label:function(c){return ' '+c.label+': '+fR(c.raw);}}}
+        }
+      }
+    });
+  } else if(c2 && !catKeys.length){
+    LD_CH_SAI = new Chart(c2.getContext('2d'),{type:'doughnut',data:{labels:['Sem saídas'],datasets:[{data:[1],backgroundColor:['#1b1d34'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{labels:{color:'#46456a'}}}}});
+  }
+
+  /* Lista de transações */
+  var list = document.getElementById('ld-pay-list');
+  if(!list) return;
+  if(!d.ultimas.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:var(--t3);font-size:13px">Nenhum lançamento ainda...</div>';
+    return;
+  }
+  var TL2={entrada:'Entrada',saida:'Saída',divida:'Dívida',poupanca:'Poupança'};
+  var TC2={entrada:'pb-entrada',saida:'pb-saida',poupanca:'pb-poupanca',divida:'pb-saida'};
+  list.innerHTML = d.ultimas.map(function(t){
+    var isPos = t.tipo==='entrada';
+    var sig   = isPos?'+':'-';
+    var dt    = t.data ? (function(){ var p=t.data.split('-'); return p[2]+'/'+p[1]; })() : '—';
+    return '<div class="ld-pay-item">'
+      +'<div>'
+        +'<div class="ld-pay-amt'+(isPos?'':' neg')+'">'+sig+fR(t.val||0)+'</div>'
+        +'<div class="ld-pay-desc">'+esc(t.desc||'Transação')+(t.cat?' · '+esc(t.cat):'')+'</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+        +'<div class="ld-pay-time">'+dt+'</div>'
+        +'<span class="ld-pay-badge '+(TC2[t.tipo]||'pb-entrada')+'" style="margin-top:4px;display:inline-block">'+(TL2[t.tipo]||t.tipo)+'</span>'
+      +'</div>'
+    +'</div>';
+  }).join('');
 }
 
 /* INIT */
