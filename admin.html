@@ -343,7 +343,8 @@ async function carregarUsuarios(){
   if(!initSb()) return;
   var svg=document.getElementById('refresh-btn').querySelector('svg');
   svg.classList.add('spin');
-  var res=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  /* Usar função segura que bypassa RLS só para o admin */
+  var res=await sb.rpc('get_all_profiles');
   svg.classList.remove('spin');
   if(res.error){toast('Erro: '+res.error.message,'err');return;}
   TODOS=res.data||[]; calcularMetricas(); renderTabela(TODOS);
