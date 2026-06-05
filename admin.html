@@ -299,9 +299,9 @@ serve(async (req) => {
 var SUPA_URL    = 'https://frvjcwixaftjahrkszqy.supabase.co';
 var SUPA_KEY    = 'sb_publishable_4WajZbLMppY4KVRn46Urkg_U72_GfdC';
 var ADMIN_EMAIL = 'leitefelipe570@gmail.com';
-var sb=null, TODOS=[], CURRENT_USER=null, chC=null, chP=null;
+var sb=null, sbAdmin=null, TODOS=[], CURRENT_USER=null, chC=null, chP=null;
 
-function initSb(){ if(!sb&&window.supabase) sb=window.supabase.createClient(SUPA_URL,SUPA_KEY); return !!sb; }
+function initSb(){ if(!sb&&window.supabase) sb=window.supabase.createClient(SUPA_URL,SUPA_KEY); sbAdmin=sb; return !!sb; }
 
 var _tT=null;
 function toast(msg,type){ if(_tT)clearTimeout(_tT); var t=document.getElementById('toast'); t.textContent=msg; t.style.borderColor=type==='err'?'var(--coral)':type==='ok'?'var(--teal)':'var(--b1)'; t.classList.add('on'); _tT=setTimeout(function(){t.classList.remove('on');},2800); }
@@ -343,8 +343,7 @@ async function carregarUsuarios(){
   if(!initSb()) return;
   var svg=document.getElementById('refresh-btn').querySelector('svg');
   svg.classList.add('spin');
-  /* Usar função segura que bypassa RLS só para o admin */
-  var res=await sb.rpc('get_all_profiles');
+  var res=await sbAdmin.from('profiles').select('*').order('created_at',{ascending:false});
   svg.classList.remove('spin');
   if(res.error){toast('Erro: '+res.error.message,'err');return;}
   TODOS=res.data||[]; calcularMetricas(); renderTabela(TODOS);
