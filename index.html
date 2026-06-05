@@ -1224,52 +1224,87 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 
 <!-- MODAL: PERFIL DO USUÁRIO -->
 <div class="ov" id="ov-perfil">
-  <div class="modal" style="max-width:400px">
-    <span class="modal-handle"></span>
-    <div class="modal-title">Meu Perfil</div>
+  <div class="modal" style="max-width:420px;padding:0;overflow:hidden">
+    <span class="modal-handle" style="display:block;margin:14px auto 0"></span>
 
-    <!-- FOTO DE PERFIL -->
-    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
-      <div style="position:relative;cursor:pointer" onclick="document.getElementById('input-foto').click()">
-        <div id="perfil-av-grande" style="width:80px;height:80px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--fHead);font-size:28px;font-weight:800;color:#fff;overflow:hidden;border:3px solid var(--b2)">
-          <span id="perfil-av-letra">F</span>
-          <img id="perfil-av-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%">
+    <!-- CABEÇALHO COM FOTO -->
+    <div id="perfil-header" style="position:relative;background:linear-gradient(160deg,var(--s3),var(--s2));padding:28px 24px 20px;display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid var(--b0)">
+      <!-- FOTO -->
+      <div style="position:relative;flex-shrink:0">
+        <div id="perfil-av-grande" style="width:88px;height:88px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--fHead);font-size:32px;font-weight:800;color:#000;overflow:hidden;border:3px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.4);position:relative">
+          <span id="perfil-av-letra" style="position:relative;z-index:1">?</span>
+          <img id="perfil-av-img" src="" alt="foto" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%">
         </div>
-        <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--grad);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--s2)">
-          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2"><path d="M9 2l3 3-7 7H2v-3z"/></svg>
+        <!-- Botão editar foto -->
+        <button onclick="document.getElementById('input-foto').click()" title="Alterar foto"
+          style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--gold);border:2px solid var(--s2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;padding:0"
+          onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#000" stroke-width="2"><path d="M9 2l3 3-7 7H2v-3z"/></svg>
+        </button>
+        <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
+      </div>
+      <!-- INFO -->
+      <div style="flex:1;min-width:0">
+        <div id="perfil-display-nome" style="font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+        <div id="perfil-display-email" style="font-size:12px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+        <!-- BADGE DO PLANO -->
+        <div id="perfil-plan-badge" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- CORPO -->
+    <div style="padding:20px 24px">
+
+      <!-- CARD PRO (visível apenas para assinantes) -->
+      <div id="perfil-pro-card" style="display:none;background:linear-gradient(135deg,rgba(79,143,255,.12),rgba(139,92,246,.12));border:1px solid rgba(79,143,255,.3);border-radius:var(--r2);padding:16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#4f8fff,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.5"><path d="M10 15V5M6 9l4-4 4 4"/><path d="M3 17h14"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;background:linear-gradient(90deg,#4f8fff,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Plano Pro ✦</div>
+            <div style="font-size:11px;color:var(--t2)">Assinatura ativa via Kiwify</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span> Metas ilimitadas</div>
+          <div style="font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span> Planilhas ilimitadas</div>
+          <div style="font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span> Histórico completo</div>
+          <div style="font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span> Sugestões de IA</div>
         </div>
       </div>
-      <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
-      <div style="font-size:12px;color:var(--t3);margin-top:8px">Clique para alterar a foto</div>
-    </div>
 
-    <!-- NOME -->
-    <div class="field">
-      <label>Nome completo</label>
-      <input id="perfil-nome" type="text" placeholder="Seu nome" maxlength="60" autocomplete="name">
-    </div>
-
-    <!-- EMAIL (readonly) -->
-    <div class="field">
-      <label>E-mail</label>
-      <input id="perfil-email" type="email" readonly style="opacity:.6;cursor:not-allowed">
-    </div>
-
-    <!-- PLANO -->
-    <div style="background:var(--s3);border:1px solid var(--b0);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:3px">Seu plano atual</div>
-          <div id="perfil-plano-label" style="font-size:15px;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Plano Gratuito</div>
+      <!-- CARD GRATUITO / UPGRADE (visível para não-pro) -->
+      <div id="perfil-free-card" style="display:none;background:var(--s3);border:1px solid var(--b0);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:2px">Plano atual</div>
+            <div style="font-size:14px;font-weight:700;color:var(--t1)">Gratuito</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:3px">5 metas · 2 planilhas · 3 meses</div>
+          </div>
+          <button onclick="closeOv('ov-perfil');go('planos')" class="btn btn-gold btn-sm" style="flex-shrink:0;white-space:nowrap">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 1v12M1 7h12"/></svg>
+            Assinar Pro
+          </button>
         </div>
-        <div id="perfil-upgrade-btn"></div>
       </div>
-      <div id="perfil-plano-info" style="font-size:12px;color:var(--t3);margin-top:6px"></div>
-    </div>
 
-    <div class="modal-foot">
-      <button class="btn btn-gold" onclick="salvarPerfil()">Salvar</button>
-      <button class="btn btn-ghost" onclick="closeOv('ov-perfil')">Fechar</button>
+      <!-- NOME -->
+      <div class="field">
+        <label>Nome completo</label>
+        <input id="perfil-nome" type="text" placeholder="Seu nome" maxlength="60" autocomplete="name" oninput="document.getElementById('perfil-display-nome').textContent=this.value||'—'">
+      </div>
+
+      <!-- EMAIL (readonly) -->
+      <div class="field">
+        <label>E-mail</label>
+        <input id="perfil-email" type="email" readonly style="opacity:.55;cursor:not-allowed">
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-gold" onclick="salvarPerfil()">Salvar alterações</button>
+        <button class="btn btn-ghost" onclick="closeOv('ov-perfil')">Fechar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1557,23 +1592,12 @@ function handleAvatarUpload(event){
   reader.readAsDataURL(file);
 }
 
-/* ── Save profile ── */
-async function salvarPerfil(){
-  var nome = (document.getElementById('perfil-nome').value||'').trim();
-  if(!nome){toast('Informe seu nome','err');return;}
-
-  /* If new avatar pending, apply it */
-  if(USER_PROFILE._pendingAvatar){
-    USER_PROFILE.avatar_url = USER_PROFILE._pendingAvatar;
-    delete USER_PROFILE._pendingAvatar;
-  }
-
-  /* Update Supabase */
-  if(sb && AUTH_USER){
-    var upd = {nome: nome};
-    if(USER_PROFILE.avatar_url) upd.avatar_url = USER_PROFILE.avatar_url;
-    var res = await sb.from('profiles').update(upd).eq('id', AUTH_USER.id);
-    if(res.error){ toast('Erro ao salvar: '+res.error.message,'err'); return; }
+/* ── Save profile (legacy stub — função real abaixo) ── */
+async function _salvarPerfilLegacy(){
+  /* removido — ver salvarPerfil() abaixo */
+  if(false){
+    var upd = {};
+    if(upd) return;
   }
 
   /* Update local state */
@@ -2876,48 +2900,65 @@ async function abrirConta(){
 async function abrirPerfil(){
   if(!AUTH_USER) return;
 
-  /* Buscar nome fresco do Supabase sempre que abrir */
+  /* Buscar dados frescos do Supabase */
   if(sb){
-    var res = await sb.from('profiles').select('nome,avatar_url,plano').eq('id', AUTH_USER.id).single();
+    var res = await sb.from('profiles').select('nome,avatar_url,plano,is_admin').eq('id', AUTH_USER.id).single();
     if(res.data){
-      if(res.data.nome) USER_PROFILE.nome = res.data.nome;
+      if(res.data.nome)       USER_PROFILE.nome       = res.data.nome;
       if(res.data.avatar_url) USER_PROFILE.avatar_url = res.data.avatar_url;
-      if(res.data.plano) USER_PROFILE.plano = res.data.plano;
+      if(res.data.plano)      USER_PROFILE.plano      = res.data.plano;
+      if(res.data.is_admin)   USER_PROFILE.is_admin   = res.data.is_admin;
       try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
     }
   }
 
-  /* Preencher email */
-  var emailEl = document.getElementById('perfil-email');
-  if(emailEl) emailEl.value = AUTH_USER.email||'';
-
-  /* Preencher nome — sempre do USER_PROFILE atualizado */
-  var nomeEl = document.getElementById('perfil-nome');
-  if(nomeEl) nomeEl.value = USER_PROFILE.nome || '';
-
-  /* Foto atual */
-  var avatarImg = document.getElementById('perfil-av-img');
-  var avatarLetra = document.getElementById('perfil-av-letra');
-  if(AUTH_USER.user_metadata && AUTH_USER.user_metadata.avatar_url){
-    if(avatarImg){ avatarImg.src=AUTH_USER.user_metadata.avatar_url; avatarImg.style.display='block'; }
-    if(avatarLetra) avatarLetra.style.display='none';
-  }
-
-  /* Plano info */
+  var p     = USER_PROFILE;
+  var nome  = p.nome || AUTH_USER.email.split('@')[0];
+  var email = AUTH_USER.email || '';
   var plano = getPlano();
-  var plLabel = document.getElementById('perfil-plano-label');
-  var plInfo  = document.getElementById('perfil-plano-info');
-  var plBtn   = document.getElementById('perfil-upgrade-btn');
-  if(plLabel) plLabel.textContent = plano==='pro' ? 'Plano Pro ✦' : 'Plano Gratuito';
-  if(plInfo){
-    plInfo.textContent = plano==='pro'
-      ? 'Acesso completo — metas, planilhas e histórico ilimitados.'
-      : 'Limitado: até 5 metas, 2 planilhas, 3 meses no histórico.';
+  var isPro = plano === 'pro';
+
+  /* --- Cabeçalho: nome e email --- */
+  var dispNome  = document.getElementById('perfil-display-nome');
+  var dispEmail = document.getElementById('perfil-display-email');
+  if(dispNome)  dispNome.textContent  = nome;
+  if(dispEmail) dispEmail.textContent = email;
+
+  /* --- Campos de edição --- */
+  var nomeEl  = document.getElementById('perfil-nome');
+  var emailEl = document.getElementById('perfil-email');
+  if(nomeEl)  nomeEl.value  = nome;
+  if(emailEl) emailEl.value = email;
+
+  /* --- Foto de perfil --- */
+  var avatarImg   = document.getElementById('perfil-av-img');
+  var avatarLetra = document.getElementById('perfil-av-letra');
+  var avatarUrl   = p.avatar_url
+    || (AUTH_USER.user_metadata && AUTH_USER.user_metadata.avatar_url)
+    || (AUTH_USER.user_metadata && AUTH_USER.user_metadata.picture)
+    || '';
+  if(avatarUrl && avatarImg){
+    avatarImg.src          = avatarUrl;
+    avatarImg.style.display = 'block';
+    if(avatarLetra) avatarLetra.style.display = 'none';
+  } else {
+    if(avatarImg)   avatarImg.style.display   = 'none';
+    if(avatarLetra){ avatarLetra.style.display = 'block'; avatarLetra.textContent = nome.charAt(0).toUpperCase(); }
   }
-  if(plBtn){
-    plBtn.innerHTML = plano==='pro' ? '<span style="font-size:11px;color:var(--teal)">✦ Ativo</span>'
-      : '<button class="btn btn-gold btn-sm" onclick="closeOv(\'ov-perfil\');go(\'planos\')">Fazer upgrade</button>';
+
+  /* --- Badge do plano no header --- */
+  var badge = document.getElementById('perfil-plan-badge');
+  if(badge){
+    badge.innerHTML = isPro
+      ? '<span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,rgba(79,143,255,.18),rgba(139,92,246,.18));border:1px solid rgba(79,143,255,.35);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;background-clip:padding-box"><span style="background:linear-gradient(90deg,#4f8fff,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">✦ Pro</span></span>'
+      : '<span style="display:inline-flex;align-items:center;background:var(--s4);border:1px solid var(--b1);border-radius:20px;padding:3px 11px;font-size:11px;color:var(--t3)">Gratuito</span>';
   }
+
+  /* --- Cards de plano --- */
+  var proCard  = document.getElementById('perfil-pro-card');
+  var freeCard = document.getElementById('perfil-free-card');
+  if(proCard)  proCard.style.display  = isPro ? 'block' : 'none';
+  if(freeCard) freeCard.style.display = isPro ? 'none'  : 'block';
 
   openOv('ov-perfil');
 }
@@ -2984,15 +3025,16 @@ function compressImage(file, maxSize, quality){
   });
 }
 
-/* ── Salvar nome ── */
+/* ── Salvar perfil ── */
 async function salvarPerfil(){
   var nome = (document.getElementById('perfil-nome').value||'').trim();
-  if(!nome){ toast('Digite seu nome','err'); return; }
-  if(!sb || !AUTH_USER) return;
+  if(!nome){ toast('Informe seu nome','err'); return; }
+  if(!sb || !AUTH_USER){ toast('Não autenticado','err'); return; }
 
-  await sb.from('profiles').update({nome:nome}).eq('id', AUTH_USER.id);
+  var res = await sb.from('profiles').update({nome:nome}).eq('id', AUTH_USER.id);
+  if(res.error){ toast('Erro ao salvar: '+res.error.message,'err'); return; }
 
-  /* Update cache */
+  /* Atualizar cache e UI */
   USER_PROFILE.nome = nome;
   try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
 
@@ -3000,6 +3042,11 @@ async function salvarPerfil(){
   var hn = document.getElementById('hero-name');
   if(hn) hn.textContent = esc(nome.split(' ')[0]);
 
+  /* Atualizar header do modal */
+  var dispNome = document.getElementById('perfil-display-nome');
+  if(dispNome) dispNome.textContent = nome;
+
+  toast('Perfil atualizado!','ok');
   closeOv('ov-perfil');
   toast('Perfil atualizado!','ok');
 }
