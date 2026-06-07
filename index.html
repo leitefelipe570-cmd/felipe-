@@ -550,6 +550,7 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 .per-btn:hover:not(.on){color:var(--t1)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -4112,24 +4113,48 @@ function extShowMsg(msg){
 }
 
 /* ── Parser PDF (extrai texto via FileReader + regex) ── */
-function extLoadFilePDF(file){
-  /* PDFs simples: tentar ler como texto (funciona em PDFs não criptografados/texto) */
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var text = e.target.result || '';
-    /* Limpar caracteres especiais de PDF */
-    text = text.replace(/\x00/g,' ').replace(/[^\x20-\x7E\xA0-\xFF\n\r]/g,' ');
-    if(text.trim().length < 20){
-      extShowMsg('PDF com conteúdo protegido ou escaneado. Copie o texto manualmente e cole abaixo.');
+async function extLoadFilePDF(file){
+  extShowMsg('📄 Lendo PDF, aguarde...');
+  try{
+    if(!window.pdfjsLib){
+      extShowMsg('Não foi possível carregar o leitor de PDF. Copie o texto do PDF e cole no campo abaixo.');
       return;
     }
-    document.getElementById('ext-paste').value = text;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    var buf = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({data: buf}).promise;
+    var fullText = '';
+
+    for(var i=1; i<=pdf.numPages; i++){
+      var page = await pdf.getPage(i);
+      var content = await page.getTextContent();
+      /* Reconstruir linhas com base na posição vertical (Y) de cada item */
+      var linhas = {};
+      content.items.forEach(function(it){
+        var y = Math.round(it.transform[5]);
+        linhas[y] = linhas[y] || [];
+        linhas[y].push(it.str);
+      });
+      var ys = Object.keys(linhas).map(Number).sort(function(a,b){return b-a;});
+      ys.forEach(function(y){ fullText += linhas[y].join(' ') + '\n'; });
+      fullText += '\n';
+    }
+
+    fullText = fullText.replace(/ /g,' ').trim();
+
+    if(fullText.length < 20){
+      extShowMsg('PDF parece estar escaneado (imagem) ou protegido — não há texto para extrair. Copie o texto manualmente e cole no campo abaixo.');
+      return;
+    }
+
+    document.getElementById('ext-paste').value = fullText;
+    extShowMsg('✅ PDF lido com sucesso! Processando transações...');
     extProcessar();
-  };
-  reader.onerror = function(){
-    extShowMsg('Erro ao ler o PDF. Tente copiar o texto do PDF e colar no campo abaixo.');
-  };
-  reader.readAsText(file, 'utf-8');
+  }catch(err){
+    console.error('Erro ao ler PDF:', err);
+    extShowMsg('Não foi possível ler este PDF (' + (err && err.message ? err.message : 'formato não suportado') + '). Copie o texto do PDF e cole no campo abaixo.');
+  }
 }
 
 /* ── Carregar arquivo (atualizado para suportar PDF) ── */
