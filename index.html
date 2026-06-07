@@ -2390,14 +2390,135 @@ function renderFin(){
   document.getElementById('fdv').textContent=fR(dv);
   var se=document.getElementById('fsl');se.textContent=fR(sl);se.style.color=sl>=0?'var(--gold)':'var(--coral)';
   var tl=document.getElementById('trlist');
-  if(!D.trans.length){tl.innerHTML='<div class="empty"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="11" rx="2"/><path d="M1 10h18"/></svg><p>Nenhum lançamento ainda</p></div>';return;}
-  tl.innerHTML=D.trans.slice(0,30).map(function(t){
-    var c=TC[t.tipo]||'var(--t2)';var sig=t.tipo==='entrada'?'+':'-';
-    return'<div class="tx"><div class="tx-ico" style="background:'+c+'15"><svg viewBox="0 0 16 16" fill="none" stroke="'+c+'" stroke-width="1.5" width="14" height="14">'+(t.tipo==='entrada'?'<path d="M8 12V4m-3 3 3-3 3 3"/>':'<path d="M8 4v8m-3-3 3 3 3-3"/>')+'</svg></div>'
-    +'<div class="tx-bd"><div class="tx-desc">'+t.desc+'</div><div class="tx-meta">'+TL[t.tipo]+' · '+t.cat+'</div></div>'
-    +'<div class="tx-r"><div class="tx-val" style="color:'+c+'">'+sig+' '+fR(t.val)+'</div><div class="tx-date">'+t.data+'</div></div>'
-    +'<button class="del-btn" onclick="delTrans(\''+t.id+'\')">×</button></div>';
+  if(!D.trans.length){FIN_SEL={};tl.innerHTML='<div class="empty"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="11" rx="2"/><path d="M1 10h18"/></svg><p>Nenhum lançamento ainda</p></div>';return;}
+  renderFinAgrupado(tl);
+}
+
+/* ── LANÇAMENTOS — agrupados por ano/mês com seleção em massa ── */
+var FIN_SEL = {}; /* ids selecionados para exclusão em massa */
+
+function finToggle(id,chk){ if(chk) FIN_SEL[id]=true; else delete FIN_SEL[id]; finUpdateBar(); }
+
+function finUpdateBar(){
+  var n=Object.keys(FIN_SEL).length;
+  var bar=document.getElementById('fin-bulk-bar');
+  if(!bar) return;
+  if(n>0){ bar.style.display='flex'; bar.querySelector('.fin-bulk-count').textContent=n+(n===1?' selecionado':' selecionados'); }
+  else bar.style.display='none';
+}
+
+async function finApagarSelecionados(){
+  var ids=Object.keys(FIN_SEL);
+  if(!ids.length) return;
+  if(!confirm('Apagar '+ids.length+' lançamento(s) selecionado(s)? Esta ação não pode ser desfeita.')) return;
+  D.trans=D.trans.filter(function(t){return !FIN_SEL[t.id];});
+  save();
+  for(var i=0;i<ids.length;i++){ await dbDelete('transacoes',ids[i]); }
+  FIN_SEL={};
+  toast(ids.length+' lançamento(s) apagado(s)','ok');
+  renderFin();
+  if(CUR==='planilha')renderShActive();
+}
+
+async function finApagarGrupo(filterFn,label){
+  var alvo=D.trans.filter(filterFn);
+  if(!alvo.length) return;
+  if(!confirm('Apagar TODOS os '+alvo.length+' lançamentos de '+label+'? Esta ação não pode ser desfeita.')) return;
+  var ids=alvo.map(function(t){return t.id;});
+  D.trans=D.trans.filter(function(t){return !filterFn(t);});
+  save();
+  for(var i=0;i<ids.length;i++){ await dbDelete('transacoes',ids[i]); delete FIN_SEL[ids[i]]; }
+  toast('Lançamentos de '+label+' apagados','ok');
+  renderFin();
+  if(CUR==='planilha')renderShActive();
+}
+
+function finToggleAno(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+function finToggleMes(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+
+function finSelecionarGrupo(filterFn,chk){
+  D.trans.filter(filterFn).forEach(function(t){ if(chk) FIN_SEL[t.id]=true; else delete FIN_SEL[t.id]; });
+  finUpdateBar();
+  renderFin();
+}
+
+function renderFinAgrupado(tl){
+  /* agrupa por ano -> mês (mais recente primeiro) */
+  var grupos={};
+  D.trans.forEach(function(t){
+    var ym=(t.data||'').match(/^(\d{4})-(\d{2})/);
+    var ano = ym?ym[1]:'Sem data', mes = ym?ym[2]:'00';
+    grupos[ano]=grupos[ano]||{};
+    grupos[ano][mes]=grupos[ano][mes]||[];
+    grupos[ano][mes].push(t);
+  });
+  var anos=Object.keys(grupos).sort(function(a,b){return b.localeCompare(a);});
+
+  var html='<div id="fin-bulk-bar" style="display:none;align-items:center;gap:10px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:var(--r);padding:10px 14px;margin-bottom:12px">'
+    +'<span class="fin-bulk-count" style="font-weight:600;color:var(--gold)">0 selecionados</span>'
+    +'<button class="btn btn-ghost btn-sm" onclick="FIN_SEL={};finUpdateBar();renderFin();">Limpar seleção</button>'
+    +'<button class="btn btn-sm" style="background:var(--coral);color:#fff;margin-left:auto" onclick="finApagarSelecionados()">🗑 Apagar selecionados</button>'
+  +'</div>';
+
+  html += anos.map(function(ano,aIdx){
+    var meses=Object.keys(grupos[ano]).sort(function(a,b){return b.localeCompare(a);});
+    var anoId='fin-ano-'+ano;
+    var anoTotal=0,anoCount=0;
+    meses.forEach(function(m){grupos[ano][m].forEach(function(t){anoCount++; anoTotal+=(t.tipo==='entrada'?t.val:-t.val);});});
+
+    var mesesHtml=meses.map(function(m,mIdx){
+      var rows=grupos[ano][m].slice().sort(function(a,b){return (b.data||'').localeCompare(a.data||'');});
+      var mesId=anoId+'-mes-'+m;
+      var ent=0,sai=0;
+      rows.forEach(function(t){ if(t.tipo==='entrada') ent+=t.val; else sai+=t.val; });
+      var saldo=ent-sai;
+      var nomeMes = (m!=='00'&&EXT_MESES[parseInt(m,10)-1]) ? EXT_MESES[parseInt(m,10)-1] : 'Sem data';
+
+      var itensHtml=rows.map(function(t){
+        var c=TC[t.tipo]||'var(--t2)';var sig=t.tipo==='entrada'?'+':'-';
+        var checked=FIN_SEL[t.id]?' checked':'';
+        return '<div class="tx">'
+          +'<input type="checkbox" class="fin-chk"'+checked+' onchange="finToggle(\''+t.id+'\',this.checked)" style="width:16px;height:16px;cursor:pointer;flex-shrink:0">'
+          +'<div class="tx-ico" style="background:'+c+'15"><svg viewBox="0 0 16 16" fill="none" stroke="'+c+'" stroke-width="1.5" width="14" height="14">'+(t.tipo==='entrada'?'<path d="M8 12V4m-3 3 3-3 3 3"/>':'<path d="M8 4v8m-3-3 3 3 3-3"/>')+'</svg></div>'
+          +'<div class="tx-bd"><div class="tx-desc">'+esc(t.desc)+'</div><div class="tx-meta">'+TL[t.tipo]+' · '+esc(t.cat)+'</div></div>'
+          +'<div class="tx-r"><div class="tx-val" style="color:'+c+'">'+sig+' '+fR(t.val)+'</div><div class="tx-date">'+t.data+'</div></div>'
+          +'<button class="del-btn" onclick="delTrans(\''+t.id+'\')">×</button>'
+        +'</div>';
+      }).join('');
+
+      return '<div class="rlt-mes">'
+        +'<div class="rlt-mes-head" style="cursor:default">'
+          +'<div class="rlt-mes-lbl" style="cursor:pointer" onclick="finToggleMes(\''+mesId+'\')">'
+            +'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2v4M13 2v4"/></svg>'
+            +nomeMes+' '+(ano!=='Sem data'?ano:'')+' <span style="color:var(--t3);font-size:11px">('+rows.length+' lançamentos)</span>'
+          +'</div>'
+          +'<div class="rlt-mes-stats" style="display:flex;align-items:center;gap:10px">'
+            +'<span style="color:var(--teal)">+'+fR(ent)+'</span>'
+            +'<span style="color:var(--coral)">-'+fR(sai)+'</span>'
+            +'<span style="color:'+(saldo>=0?'var(--gold)':'var(--coral)')+'">= '+fR(saldo)+'</span>'
+            +'<button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px" onclick="finApagarGrupo(function(t){return (t.data||\'\').slice(0,7)===\''+(ano!=='Sem data'?ano+'-'+m:'')+'\'&&'+(ano==='Sem data'?'!/^\\\\d{4}-\\\\d{2}/.test(t.data||\'\')':'true')+';},\''+nomeMes+' '+(ano!=='Sem data'?ano:'')+'\')" title="Apagar todos deste mês">🗑 mês</button>'
+          +'</div>'
+        +'</div>'
+        +'<div class="rlt-trans-list'+(aIdx===0&&mIdx===0?' open':'')+'" id="'+mesId+'">'+itensHtml+'</div>'
+      +'</div>';
+    }).join('');
+
+    var anoFiltro = ano!=='Sem data' ? "function(t){return (t.data||'').slice(0,4)==='"+ano+"';}" : "function(t){return !/^\\d{4}-\\d{2}/.test(t.data||'');}";
+
+    return '<div class="rlt-ano">'
+      +'<div class="rlt-ano-head" style="cursor:default;display:flex;align-items:center;justify-content:space-between;gap:10px">'
+        +'<div style="cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700" onclick="finToggleAno(\''+anoId+'\')">'
+          +'<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2v4M13 2v4"/></svg>'
+          +(ano!=='Sem data'?ano:'Sem data')+' <span style="color:var(--t3);font-weight:400;font-size:12px">('+anoCount+' lançamentos · saldo '+fR(anoTotal)+')</span>'
+        +'</div>'
+        +'<button class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;color:var(--coral)" onclick="finApagarGrupo('+anoFiltro+',\''+(ano!=='Sem data'?ano:'sem data')+'\')" title="Apagar todos deste ano">🗑 apagar ano inteiro</button>'
+      +'</div>'
+      +'<div class="rlt-trans-list'+(aIdx===0?' open':'')+'" id="'+anoId+'">'+mesesHtml+'</div>'
+    +'</div>';
   }).join('');
+
+  tl.innerHTML=html;
+  finUpdateBar();
 }
 
 /* PLANILHA — SEED */
