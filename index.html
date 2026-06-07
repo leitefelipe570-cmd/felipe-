@@ -1590,6 +1590,7 @@ function startAuthListener(){
       AUTH_USER = session.user;
       loadUserProfile();
       goApp();
+      setTimeout(syncPlano, 1500);
     } else {
       AUTH_USER = null;
       showAuthPage();
@@ -1630,8 +1631,9 @@ var USER_PROFILE = {nome:'', plano:'gratuito', avatar_url:'', is_admin:false};
 
 function loadUserProfile(){
   if(!sb || !AUTH_USER) return;
-  sb.from('profiles').select('nome,plano,avatar_url,is_admin,status').eq('id', AUTH_USER.id).single()
+  sb.from('profiles').select('nome,plano,avatar_url,is_admin,status').eq('id', AUTH_USER.id).maybeSingle()
     .then(function(res){
+      if(res.error) console.error('loadUserProfile erro:', res.error);
       if(res.data){
         /* Verificar se está bloqueado */
         if(res.data.status === 'bloqueado'){
@@ -1663,8 +1665,34 @@ function loadUserProfile(){
         applyPlanLimits(USER_PROFILE.plano);
         loadAllData();
       }
-    });
+    })
+    .catch(function(err){ console.error('loadUserProfile falhou:', err); });
 }
+
+/* Re-sincroniza o plano com o banco (chamado ao abrir o app, focar a aba, etc.)
+   Corrige casos em que a assinatura Pro foi ativada via webhook enquanto a
+   sessão já estava aberta e o badge da barra lateral ficou desatualizado. */
+function syncPlano(){
+  if(!sb || !AUTH_USER) return;
+  sb.from('profiles').select('plano,is_admin,status').eq('id', AUTH_USER.id).maybeSingle()
+    .then(function(res){
+      if(res.error || !res.data) return;
+      if(res.data.status === 'bloqueado'){ sb.auth.signOut(); showAuthPage(); return; }
+      var mudou = (USER_PROFILE.plano !== (res.data.plano||'gratuito')) || (USER_PROFILE.is_admin !== !!res.data.is_admin);
+      USER_PROFILE.plano    = res.data.plano || 'gratuito';
+      USER_PROFILE.is_admin = res.data.is_admin || false;
+      try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
+      renderUserUI();
+      applyPlanLimits(USER_PROFILE.plano);
+      if(mudou && USER_PROFILE.plano==='pro') toast('Seu plano Pro está ativo! ✦','ok');
+    })
+    .catch(function(){});
+}
+/* Sincroniza ao voltar para a aba/janela (ex: após pagar no Kiwify e retornar) */
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible') syncPlano();
+});
+window.addEventListener('focus', syncPlano);
 
 function renderUserUI(){
   var p = USER_PROFILE;
