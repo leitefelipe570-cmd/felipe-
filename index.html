@@ -3971,7 +3971,9 @@ function extDropFile(e){
 /* ── Renderizar resultado ── */
 function extRenderResultado(){
   var rows = EXT_ROWS;
-  document.getElementById('ext-input-area').style.display='none';
+  /* Mantém o campo de upload sempre visível — assim o usuário pode
+     sempre enviar um novo extrato sem precisar achar o botão "Novo extrato" */
+  document.getElementById('ext-input-area').style.display='block';
   document.getElementById('ext-resultado').style.display='block';
   document.getElementById('ext-import-btn-wrap').style.display='block';
   document.getElementById('ext-count').textContent = rows.length;
@@ -4101,11 +4103,11 @@ function extImportarSelecionados(){
    tentativa anterior (ex: PDF que falhou ao processar). */
 function extGarantirArea(){
   var area = document.getElementById('ext-input-area');
-  var res  = document.getElementById('ext-resultado');
-  if(area && (!EXT_ROWS || !EXT_ROWS.length)){
-    area.style.display='block';
-    if(res) res.style.display='none';
+  if(area) area.style.display='block';
+  if(!EXT_ROWS || !EXT_ROWS.length){
+    var res = document.getElementById('ext-resultado');
     var btnWrap = document.getElementById('ext-import-btn-wrap');
+    if(res) res.style.display='none';
     if(btnWrap) btnWrap.style.display='none';
   }
 }
