@@ -2167,7 +2167,7 @@ function go(id){
   else if(id==='financeiro')renderFin();
   else if(id==='planilha'){renderShTabs();renderShAtiva();}
   else if(id==='analitico'){renderAnalitico();}
-  else if(id==='extrato'){/* extrato is self-contained */}
+  else if(id==='extrato'){ extGarantirArea(); }
   else if(id==='live'){renderLive();}
   else if(id==='historico'){renderHistorico();}
 }
@@ -4096,6 +4096,20 @@ function extImportarSelecionados(){
 }
 
 /* ── Reset ── */
+/* Garante que o campo de upload/colagem do extrato esteja sempre visível
+   ao abrir a aba — evita ficar "preso" numa tela de resultado de uma
+   tentativa anterior (ex: PDF que falhou ao processar). */
+function extGarantirArea(){
+  var area = document.getElementById('ext-input-area');
+  var res  = document.getElementById('ext-resultado');
+  if(area && (!EXT_ROWS || !EXT_ROWS.length)){
+    area.style.display='block';
+    if(res) res.style.display='none';
+    var btnWrap = document.getElementById('ext-import-btn-wrap');
+    if(btnWrap) btnWrap.style.display='none';
+  }
+}
+
 function extReset(){
   EXT_ROWS=[];
   if(EXT_CHART){ EXT_CHART.destroy(); EXT_CHART=null; }
