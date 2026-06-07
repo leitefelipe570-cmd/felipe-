@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suvita — Suba na Vida | Organize sua grana, mesmo sem CLT</title>
+<meta name="description" content="O app de finanças e produtividade feito para quem vive da correria: motoristas de app, autônomos e prestadores de serviço.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#07080f;
+    --s1:#0e0f1c;
+    --s2:#141528;
+    --s3:#1b1d34;
+    --b0:rgba(255,255,255,.06);
+    --b1:rgba(255,255,255,.10);
+    --gold:#f5a623;
+    --gold2:#ffc55e;
+    --gf:rgba(245,166,35,.12);
+    --coral:#ff6b6b;
+    --blue:#5b8af5;
+    --purple:#9f7aea;
+    --teal:#38d9a9;
+    --t1:#f2f0fa;
+    --t2:#9896b5;
+    --t3:#5b5a7a;
+    --r:18px;
+    --fHead:'Instrument Serif',serif;
+    --fBody:'Inter',sans-serif;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--t1);
+    font-family:var(--fBody);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  img,svg{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  section{position:relative}
+
+  /* Background glow */
+  body::before{
+    content:'';
+    position:fixed;top:-20%;left:50%;transform:translateX(-50%);
+    width:900px;height:900px;
+    background:radial-gradient(circle, rgba(245,166,35,.16) 0%, transparent 65%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── HEADER ── */
+  header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(7,8,15,.7);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--b0);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1180px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--fHead);font-size:24px;font-weight:600;letter-spacing:.02em}
+  .logo .dot{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--coral));display:flex;align-items:center;justify-content:center;font-family:var(--fBody);font-weight:800;color:#07080f;font-size:16px}
+  .logo em{font-style:italic;color:var(--gold)}
+  nav.links{display:flex;gap:32px;font-size:14px;font-weight:500;color:var(--t2)}
+  nav.links a:hover{color:var(--t1)}
+  .nav-cta{display:flex;gap:12px;align-items:center}
+  .hamb{display:none;background:none;border:none;color:var(--t1);font-size:24px;cursor:pointer}
+
+  /* ── BUTTONS ── */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;border-radius:12px;font-weight:700;font-size:14px;
+    cursor:pointer;border:none;transition:all .2s ease;white-space:nowrap;
+  }
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1305;box-shadow:0 8px 24px rgba(245,166,35,.28)}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(245,166,35,.4)}
+  .btn-ghost{background:var(--s2);color:var(--t1);border:1px solid var(--b1)}
+  .btn-ghost:hover{background:var(--s3);border-color:var(--b1)}
+  .btn-lg{padding:16px 34px;font-size:16px;border-radius:14px}
+
+  /* ── HERO ── */
+  .hero{padding:90px 0 60px;text-align:center;position:relative;z-index:1}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--gf);border:1px solid rgba(245,166,35,.25);
+    color:var(--gold);font-size:13px;font-weight:600;
+    padding:8px 18px;border-radius:30px;margin-bottom:28px;
+  }
+  .hero h1{
+    font-family:var(--fHead);font-weight:400;
+    font-size:clamp(38px,7vw,72px);line-height:1.08;
+    letter-spacing:-.01em;max-width:880px;margin:0 auto 22px;
+  }
+  .hero h1 em{font-style:italic;background:linear-gradient(135deg,var(--gold),var(--coral));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero .sub{
+    color:var(--t2);font-size:18px;max-width:620px;margin:0 auto 36px;
+  }
+  .hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .hero-note{color:var(--t3);font-size:13px}
+
+  .hero-shot{
+    margin:60px auto 0;max-width:980px;
+    border-radius:24px;border:1px solid var(--b1);
+    background:linear-gradient(180deg,var(--s2),var(--s1));
+    padding:14px;box-shadow:0 40px 100px -20px rgba(0,0,0,.6);
+  }
+  .hero-shot-inner{
+    border-radius:14px;overflow:hidden;border:1px solid var(--b0);
+    background:var(--s1);aspect-ratio:16/9;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .mock-grid{display:grid;grid-template-columns:200px 1fr;width:100%;height:100%}
+  .mock-side{background:var(--s2);border-right:1px solid var(--b0);padding:22px 16px;display:flex;flex-direction:column;gap:14px}
+  .mock-pill{height:10px;border-radius:6px;background:var(--b1)}
+  .mock-pill.gold{background:linear-gradient(90deg,var(--gold),var(--gold2));width:70%}
+  .mock-main{padding:26px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:start}
+  .mock-card{background:var(--s2);border:1px solid var(--b0);border-radius:12px;padding:16px;height:100px;display:flex;flex-direction:column;justify-content:space-between}
+  .mock-card .l{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+  .mock-card .v{font-family:var(--fHead);font-size:22px}
+  .mock-card.g .v{color:var(--gold)}
+  .mock-card.t .v{color:var(--teal)}
+  .mock-card.c .v{color:var(--coral)}
+  .mock-bar{grid-column:span 3;background:var(--s2);border:1px solid var(--b0);border-radius:12px;padding:18px;height:120px;display:flex;align-items:flex-end;gap:8px}
+  .mock-bar i{flex:1;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--gold),rgba(245,166,35,.15))}
+
+  @media(max-width:700px){.mock-grid{grid-template-columns:1fr}.mock-side{display:none}.mock-main{grid-template-columns:repeat(2,1fr)}.mock-bar{grid-column:span 2}}
+
+  /* Section heading */
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
+  .eyebrow{color:var(--gold);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+  .sec-head h2{font-family:var(--fHead);font-weight:400;font-size:clamp(30px,5vw,46px);line-height:1.15;margin-bottom:14px}
+  .sec-head p{color:var(--t2);font-size:16px}
+  section{padding:90px 0}
+
+  /* ── BENEFÍCIOS ── */
+  .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:860px){.bgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.bgrid{grid-template-columns:1fr}}
+  .bcard{
+    background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);
+    padding:30px;transition:all .25s ease;
+  }
+  .bcard:hover{transform:translateY(-6px);border-color:var(--b1);background:var(--s2)}
+  .bicon{
+    width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    margin-bottom:20px;font-size:22px;
+  }
+  .bcard h3{font-size:19px;font-weight:700;margin-bottom:10px;font-family:var(--fBody)}
+  .bcard p{color:var(--t2);font-size:14.5px}
+
+  /* ── SOBRE ── */
+  .about{
+    display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+  }
+  @media(max-width:860px){.about{grid-template-columns:1fr;gap:36px}}
+  .about-card{
+    background:linear-gradient(160deg,var(--s2),var(--s1));
+    border:1px solid var(--b1);border-radius:var(--r);padding:40px;
+  }
+  .about-card .stat-row{display:flex;gap:34px;margin-top:30px;flex-wrap:wrap}
+  .stat b{font-family:var(--fHead);font-size:34px;color:var(--gold);display:block}
+  .stat span{font-size:13px;color:var(--t2)}
+  .about h2{font-family:var(--fHead);font-weight:400;font-size:clamp(28px,4.6vw,42px);margin-bottom:18px;line-height:1.2}
+  .about p{color:var(--t2);font-size:15.5px;margin-bottom:16px}
+  .about ul li{display:flex;gap:12px;align-items:flex-start;color:var(--t1);font-size:15px;margin-bottom:14px}
+  .check{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gf);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+
+  /* ── PROVA SOCIAL ── */
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:860px){.testi-grid{grid-template-columns:1fr}}
+  .testi{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:28px}
+  .stars{color:var(--gold);font-size:14px;margin-bottom:14px;letter-spacing:2px}
+  .testi p{color:var(--t1);font-size:15px;margin-bottom:20px}
+  .testi-who{display:flex;align-items:center;gap:12px}
+  .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#07080f}
+  .testi-who b{font-size:14px;display:block}
+  .testi-who span{font-size:12.5px;color:var(--t3)}
+  .logos-row{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:50px;opacity:.55;font-size:13px;color:var(--t2);font-weight:600;letter-spacing:.04em}
+
+  /* ── PREÇO ── */
+  .price-wrap{display:flex;justify-content:center}
+  .price-card{
+    max-width:440px;width:100%;
+    background:linear-gradient(160deg,var(--s2),var(--s1));
+    border:1px solid rgba(245,166,35,.3);border-radius:24px;
+    padding:42px;text-align:center;position:relative;overflow:hidden;
+  }
+  .price-card::before{content:'';position:absolute;top:-60%;left:50%;transform:translateX(-50%);width:340px;height:340px;background:radial-gradient(circle,rgba(245,166,35,.18),transparent 70%)}
+  .price-tag{display:inline-block;background:var(--gf);color:var(--gold);font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:20px;letter-spacing:.05em}
+  .price-val{font-family:var(--fHead);font-size:64px;line-height:1;margin-bottom:6px;position:relative}
+  .price-val span{font-size:20px;color:var(--t2);font-family:var(--fBody)}
+  .price-old{color:var(--t3);text-decoration:line-through;font-size:15px;margin-bottom:26px}
+  .price-feats{text-align:left;margin:28px 0;display:flex;flex-direction:column;gap:13px}
+  .price-feats li{display:flex;gap:10px;font-size:14.5px;color:var(--t1)}
+  .price-card .btn{width:100%;margin-top:6px}
+  .price-foot{margin-top:16px;font-size:12.5px;color:var(--t3)}
+
+  /* ── FAQ ── */
+  .faq{max-width:760px;margin:0 auto}
+  .qa{border-bottom:1px solid var(--b0);padding:22px 0}
+  .qa summary{
+    list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+    font-weight:600;font-size:16px;color:var(--t1);
+  }
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .ic{width:26px;height:26px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);transition:transform .25s ease;flex-shrink:0;margin-left:16px}
+  .qa[open] summary .ic{transform:rotate(45deg)}
+  .qa p{color:var(--t2);font-size:14.5px;margin-top:14px;max-width:640px}
+
+  /* ── CTA FINAL ── */
+  .cta-final{
+    background:linear-gradient(135deg,rgba(245,166,35,.14),rgba(159,122,234,.10));
+    border:1px solid var(--b1);border-radius:28px;
+    padding:64px 40px;text-align:center;
+  }
+  .cta-final h2{font-family:var(--fHead);font-weight:400;font-size:clamp(28px,5vw,44px);margin-bottom:14px}
+  .cta-final p{color:var(--t2);margin-bottom:30px;font-size:16px}
+
+  /* ── FOOTER ── */
+  footer{border-top:1px solid var(--b0);padding:50px 0 28px}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+  @media(max-width:700px){.foot-grid{grid-template-columns:1fr 1fr}}
+  .foot-grid h4{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:16px}
+  .foot-grid li{margin-bottom:10px}
+  .foot-grid a{color:var(--t2);font-size:14px}
+  .foot-grid a:hover{color:var(--gold)}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;padding-top:28px;border-top:1px solid var(--b0);color:var(--t3);font-size:13px}
+  .foot-social{display:flex;gap:12px}
+  .foot-social a{width:36px;height:36px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;border:1px solid var(--b0)}
+  .foot-social a:hover{border-color:var(--gold);color:var(--gold)}
+
+  @media(max-width:760px){
+    nav.links{display:none}
+    .hamb{display:block}
+    .nav-cta .btn-ghost{display:none}
+    .bgrid,.testi-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot">S</span>Su<em>vita</em></div>
+    <nav class="links">
+      <a href="#beneficios">Benefícios</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#depoimentos">Depoimentos</a>
+      <a href="#preco">Preço</a>
+      <a href="#faq">Dúvidas</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://suvita-pi.vercel.app" class="btn btn-ghost">Entrar</a>
+      <a href="#preco" class="btn btn-gold">Quero começar</a>
+    </div>
+    <button class="hamb">☰</button>
+  </div>
+</header>
+
+<!-- ───────── HERO ───────── -->
+<section class="hero">
+  <div class="wrap">
+    <span class="badge">✦ Feito para quem vive da correria</span>
+    <h1>Sua vida financeira <em>organizada</em>, mesmo sem carteira assinada</h1>
+    <p class="sub">O Suvita é o app de produtividade e finanças para motoristas de aplicativo, autônomos e prestadores de serviço que querem parar de perder dinheiro — e começar a Suba na Vida.</p>
+    <div class="hero-cta">
+      <a href="#preco" class="btn btn-gold btn-lg">Começar agora — é rápido</a>
+      <a href="#sobre" class="btn btn-ghost btn-lg">Ver como funciona</a>
+    </div>
+    <p class="hero-note">Sem cartão de crédito para testar · Cancele quando quiser</p>
+
+    <div class="hero-shot">
+      <div class="hero-shot-inner">
+        <div class="mock-grid">
+          <div class="mock-side">
+            <div class="mock-pill gold" style="width:60%;height:16px"></div>
+            <div class="mock-pill"></div>
+            <div class="mock-pill" style="width:80%"></div>
+            <div class="mock-pill" style="width:55%"></div>
+            <div class="mock-pill" style="width:70%"></div>
+            <div style="flex:1"></div>
+            <div class="mock-pill" style="width:40%"></div>
+          </div>
+          <div class="mock-main">
+            <div class="mock-card g"><span class="l">Entradas</span><span class="v">R$ 4.230</span></div>
+            <div class="mock-card c"><span class="l">Saídas</span><span class="v">R$ 1.840</span></div>
+            <div class="mock-card t"><span class="l">Saldo</span><span class="v">+R$ 2.390</span></div>
+            <div class="mock-bar">
+              <i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i>
+              <i style="height:80%"></i><i style="height:45%"></i><i style="height:70%"></i>
+              <i style="height:55%"></i><i style="height:90%"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── BENEFÍCIOS ───────── -->
+<section id="beneficios">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Por que o Suvita</div>
+      <h2>Tudo que você precisa para nunca mais perder o controle</h2>
+      <p>Construído pensando em quem ganha por corrida, por serviço ou por comissão — e precisa transformar renda variável em estabilidade.</p>
+    </div>
+    <div class="bgrid">
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(245,166,35,.12);color:var(--gold)">💰</div>
+        <h3>Controle financeiro completo</h3>
+        <p>Lance entradas e saídas em segundos, acompanhe seu saldo em tempo real e entenda exatamente para onde vai cada real.</p>
+      </div>
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(91,138,245,.12);color:var(--blue)">📊</div>
+        <h3>Importe seu extrato automaticamente</h3>
+        <p>Suba o extrato do banco em PDF, CSV ou OFX e o Suvita classifica cada transação pra você — sem digitar nada na mão.</p>
+      </div>
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(56,217,169,.12);color:var(--teal)">🎯</div>
+        <h3>Metas que você realmente cumpre</h3>
+        <p>Defina metas de economia ou de faturamento e acompanhe seu progresso dia após dia, com lembretes que mantêm você no rumo.</p>
+      </div>
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(255,107,107,.12);color:var(--coral)">✅</div>
+        <h3>Tarefas e rotina em um só lugar</h3>
+        <p>Organize sua jornada de trabalho, compromissos e lembretes — tudo no mesmo app que cuida do seu dinheiro.</p>
+      </div>
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(159,122,234,.12);color:var(--purple)">📈</div>
+        <h3>Relatórios que fazem sentido</h3>
+        <p>Veja gráficos simples e diretos sobre seus ganhos, gastos por categoria e evolução mês a mês — sem planilha complicada.</p>
+      </div>
+      <div class="bcard">
+        <div class="bicon" style="background:rgba(245,166,35,.12);color:var(--gold)">📱</div>
+        <h3>No bolso, o dia inteiro</h3>
+        <p>Funciona no celular e no computador. Lance um gasto entre uma corrida e outra, sem perder tempo nem o foco no trabalho.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── SOBRE ───────── -->
+<section id="sobre">
+  <div class="wrap">
+    <div class="about">
+      <div>
+        <div class="eyebrow">Sobre o Suvita</div>
+        <h2>Feito para quem ninguém faz aplicativo pensando</h2>
+        <p>A maioria dos apps financeiros foi desenhada para quem recebe salário fixo todo mês. Mas a realidade de quem dirige, entrega, faz bicos ou presta serviço é outra: renda variável, gastos espalhados, e pouquíssimo tempo sobrando no fim do dia.</p>
+        <p>O Suvita nasceu para resolver exatamente isso — um app simples, direto e bonito, que cabe na correria do seu dia e te ajuda a enxergar com clareza para onde vai (e de onde vem) o seu dinheiro.</p>
+        <ul>
+          <li><span class="check">✓</span> Pensado para Uber, 99, iFood, autônomos e MEIs</li>
+          <li><span class="check">✓</span> Interface rápida — nada de telas complicadas</li>
+          <li><span class="check">✓</span> Seus dados protegidos e sincronizados na nuvem</li>
+        </ul>
+      </div>
+      <div class="about-card">
+        <div class="eyebrow" style="margin-bottom:8px">Nossa missão</div>
+        <p style="color:var(--t1);font-size:17px;line-height:1.5">"Ajudar quem trabalha duro todos os dias a transformar esforço em estabilidade financeira real — sem depender de planilha, sem complicação."</p>
+        <div class="stat-row">
+          <div class="stat"><b>+12k</b><span>usuários ativos</span></div>
+          <div class="stat"><b>4.8★</b><span>avaliação média</span></div>
+          <div class="stat"><b>98%</b><span>recomendam o app</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── PROVA SOCIAL ───────── -->
+<section id="depoimentos">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Quem usa, recomenda</div>
+      <h2>Histórias reais de quem mudou de vida com o Suvita</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <p>"Eu rodava o dia inteiro de Uber e não fazia ideia de quanto sobrava no fim do mês. Com o Suvita, em duas semanas eu já tinha enxergado onde estava vazando dinheiro."</p>
+        <div class="testi-who">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--gold),var(--gold2))">RC</div>
+          <div><b>Rafael Costa</b><span>Motorista de aplicativo · SP</span></div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <p>"Sou autônoma e sempre tive dificuldade de separar gasto pessoal de gasto do trabalho. O Suvita me deu clareza pela primeira vez em anos."</p>
+        <div class="testi-who">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple))">JM</div>
+          <div><b>Juliana Martins</b><span>Manicure & esteticista · MG</span></div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <p>"Importei o extrato do banco e em menos de um minuto já estava tudo organizado por categoria. Economizei horas que eu gastava tentando montar planilha."</p>
+        <div class="testi-who">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--blue))">PS</div>
+          <div><b>Pedro Silva</b><span>Entregador & MEI · RJ</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="logos-row">
+      <span>UBER</span><span>99</span><span>IFOOD</span><span>RAPPI</span><span>MEI FÁCIL</span><span>SHOPEE</span>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── PREÇO ───────── -->
+<section id="preco">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Plano simples, sem pegadinha</div>
+      <h2>Um investimento pequeno para uma vida financeira muito mais leve</h2>
+      <p>Menos do que uma corrida de aplicativo por mês. Acesso completo, sem taxas escondidas.</p>
+    </div>
+    <div class="price-wrap">
+      <div class="price-card">
+        <span class="price-tag">PLANO PRO · MAIS POPULAR</span>
+        <div class="price-val">R$ 29<span>,90 / mês</span></div>
+        <div class="price-old">de R$ 59,90</div>
+        <ul class="price-feats">
+          <li><span class="check">✓</span> Lançamentos e metas ilimitados</li>
+          <li><span class="check">✓</span> Importação automática de extrato (PDF, CSV, OFX)</li>
+          <li><span class="check">✓</span> Relatórios e gráficos completos por categoria e período</li>
+          <li><span class="check">✓</span> Planilhas personalizadas ilimitadas</li>
+          <li><span class="check">✓</span> Suporte prioritário via WhatsApp</li>
+        </ul>
+        <a href="https://suvita-pi.vercel.app" class="btn btn-gold btn-lg">Quero organizar minha vida agora</a>
+        <p class="price-foot">🔒 Pagamento seguro · Cancele quando quiser, sem multa</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FAQ ───────── -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Perguntas frequentes</div>
+      <h2>Ainda com dúvidas? A gente responde</h2>
+    </div>
+    <div class="faq">
+      <details class="qa" open>
+        <summary>Preciso entender de finanças para usar o Suvita? <span class="ic">+</span></summary>
+        <p>Não! O Suvita foi pensado para ser simples desde o primeiro acesso. Você lança seus ganhos e gastos com poucos toques, e o app organiza tudo por você — sem termos complicados nem planilhas.</p>
+      </details>
+      <details class="qa">
+        <summary>Funciona para quem trabalha com Uber, 99 ou iFood? <span class="ic">+</span></summary>
+        <p>Sim, e é exatamente para isso que ele foi criado. Você consegue separar ganhos por plataforma, controlar combustível, manutenção e outros custos do dia a dia de quem roda na rua.</p>
+      </details>
+      <details class="qa">
+        <summary>Como funciona a importação de extrato bancário? <span class="ic">+</span></summary>
+        <p>Você sobe o arquivo do seu banco (PDF, CSV, OFX ou TXT) direto na aba Extrato, e o Suvita identifica e classifica automaticamente cada transação — separando entradas, saídas e categorias por mês e ano.</p>
+      </details>
+      <details class="qa">
+        <summary>Posso cancelar quando quiser? <span class="ic">+</span></summary>
+        <p>Sim, sem burocracia e sem multa. Você cancela direto no app ou fala com o nosso suporte, e o acesso continua até o fim do período já pago.</p>
+      </details>
+      <details class="qa">
+        <summary>Meus dados financeiros estão seguros? <span class="ic">+</span></summary>
+        <p>Totalmente. Seus dados ficam protegidos com criptografia e são armazenados em servidores seguros — só você tem acesso às suas informações.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── CTA FINAL ───────── -->
+<section>
+  <div class="wrap">
+    <div class="cta-final">
+      <h2>Pronto para Suba na Vida?</h2>
+      <p>Junte-se a milhares de pessoas que já transformaram a forma de lidar com o próprio dinheiro.</p>
+      <a href="https://suvita-pi.vercel.app" class="btn btn-gold btn-lg">Criar minha conta grátis</a>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FOOTER ───────── -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px"><span class="dot">S</span>Su<em>vita</em></div>
+        <p style="color:var(--t2);font-size:14px;max-width:280px">O app de finanças e produtividade para quem vive da correria — e quer Suba na Vida.</p>
+      </div>
+      <div>
+        <h4>Produto</h4>
+        <ul>
+          <li><a href="#beneficios">Benefícios</a></li>
+          <li><a href="#preco">Planos</a></li>
+          <li><a href="#faq">Dúvidas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="#sobre">Sobre nós</a></li>
+          <li><a href="#depoimentos">Depoimentos</a></li>
+          <li><a href="#">Contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Termos de uso</a></li>
+          <li><a href="#">Privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Suvita — Suba na Vida. Todos os direitos reservados.</span>
+      <div class="foot-social">
+        <a href="#" title="Instagram">📷</a>
+        <a href="#" title="WhatsApp">💬</a>
+        <a href="#" title="YouTube">▶</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion — fecha os outros ao abrir um
+  document.querySelectorAll('.qa').forEach(function(d){
+    d.addEventListener('toggle', function(){
+      if(d.open){
+        document.querySelectorAll('.qa').forEach(function(o){ if(o!==d) o.removeAttribute('open'); });
+      }
+    });
+  });
+</script>
+</body>
+</html>
