@@ -1632,7 +1632,7 @@ var USER_PROFILE = {nome:'', plano:'gratuito', avatar_url:'', is_admin:false};
 
 function loadUserProfile(){
   if(!sb || !AUTH_USER) return;
-  sb.from('profiles').select('nome,plano,avatar_url,is_admin,status').eq('id', AUTH_USER.id).maybeSingle()
+  sb.from('profiles').select('nome,plano,avatar_url,status').eq('id', AUTH_USER.id).maybeSingle()
     .then(function(res){
       if(res.error) console.error('loadUserProfile erro:', res.error);
       if(res.data){
@@ -1658,7 +1658,7 @@ function loadUserProfile(){
           nome:       nomeReal,
           plano:      res.data.plano || 'gratuito',
           avatar_url: res.data.avatar_url || '',
-          is_admin:   res.data.is_admin || false
+          is_admin:   (AUTH_USER.email||'').toLowerCase() === 'leitefelipe570@gmail.com'
         };
         /* Sempre atualizar cache com dados frescos do banco */
         try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
@@ -1675,13 +1675,13 @@ function loadUserProfile(){
    sessão já estava aberta e o badge da barra lateral ficou desatualizado. */
 function syncPlano(){
   if(!sb || !AUTH_USER) return;
-  sb.from('profiles').select('plano,is_admin,status').eq('id', AUTH_USER.id).maybeSingle()
+  sb.from('profiles').select('plano,status').eq('id', AUTH_USER.id).maybeSingle()
     .then(function(res){
       if(res.error || !res.data) return;
       if(res.data.status === 'bloqueado'){ sb.auth.signOut(); showAuthPage(); return; }
-      var mudou = (USER_PROFILE.plano !== (res.data.plano||'gratuito')) || (USER_PROFILE.is_admin !== !!res.data.is_admin);
+      var mudou = (USER_PROFILE.plano !== (res.data.plano||'gratuito'));
       USER_PROFILE.plano    = res.data.plano || 'gratuito';
-      USER_PROFILE.is_admin = res.data.is_admin || false;
+      USER_PROFILE.is_admin = (AUTH_USER.email||'').toLowerCase() === 'leitefelipe570@gmail.com';
       try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
       renderUserUI();
       applyPlanLimits(USER_PROFILE.plano);
@@ -3253,12 +3253,12 @@ async function abrirPerfil(){
 
   /* Buscar dados frescos do Supabase */
   if(sb){
-    var res = await sb.from('profiles').select('nome,avatar_url,plano,is_admin').eq('id', AUTH_USER.id).single();
+    var res = await sb.from('profiles').select('nome,avatar_url,plano').eq('id', AUTH_USER.id).single();
     if(res.data){
       if(res.data.nome)       USER_PROFILE.nome       = res.data.nome;
       if(res.data.avatar_url) USER_PROFILE.avatar_url = res.data.avatar_url;
       if(res.data.plano)      USER_PROFILE.plano      = res.data.plano;
-      if(res.data.is_admin)   USER_PROFILE.is_admin   = res.data.is_admin;
+      USER_PROFILE.is_admin = (AUTH_USER.email||'').toLowerCase() === 'leitefelipe570@gmail.com';
       try{ localStorage.setItem('sv_profile', JSON.stringify(USER_PROFILE)); }catch(e){}
     }
   }
