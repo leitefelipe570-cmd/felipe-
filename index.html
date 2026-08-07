@@ -794,7 +794,7 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 <main class="main" id="main">
 
 <!-- ─ DASHBOARD ─────────────────────────────────── -->
-<div class="pg on" id="pg-dash">
+<div class="pg" id="pg-dash">
   <div class="dash-hero">
     <div>
       <div class="hero-greet" id="dgreet">BOM DIA</div>
@@ -1390,7 +1390,7 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 
 
 <!-- ── LOGIN / CADASTRO ── -->
-<div class="pg" id="pg-auth">
+<div class="pg on" id="pg-auth">
   <div style="width:100%;max-width:380px">
     <div style="text-align:center;margin-bottom:2rem">
       <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:700;margin-bottom:6px;color:#ffffff">Suvita</div>
@@ -1459,6 +1459,28 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Continuar com Google
       </button>
+    </div>
+
+    <!-- FORM VERIFICAR E-MAIL (código) -->
+    <div id="form-verify" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:32px;margin-bottom:8px">📧</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Confirme seu e-mail</div>
+        <div style="font-size:12px;color:var(--t2)">Enviamos um código de 6 dígitos para <strong id="verify-email-lbl" style="color:var(--t1)"></strong></div>
+      </div>
+      <div id="f-otp" style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px">Código de confirmação</label>
+        <input id="otp-code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="text-align:center;letter-spacing:.5em;font-size:20px;font-weight:700" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
+        <div id="err-otp" style="color:var(--coral);font-size:11px;margin-top:4px;display:none">Código inválido ou expirado</div>
+      </div>
+      <button id="btn-verify" onclick="doVerifyOtp()" style="width:100%;padding:12px;background:var(--grad);border:none;border-radius:var(--r2);color:#fff;font-family:var(--fBody);font-size:14px;font-weight:600;cursor:pointer;transition:all .18s">
+        <span class="btn-txt">Confirmar código</span>
+        <span class="btn-spin" style="display:none">⏳</span>
+      </button>
+      <div style="text-align:center;margin-top:14px;display:flex;flex-direction:column;gap:8px">
+        <button id="btn-resend-otp" onclick="doResendOtp()" style="background:none;border:none;color:var(--t2);font-size:12px;cursor:pointer;font-family:var(--fBody)">Reenviar código</button>
+        <button onclick="authTab('login')" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:var(--fBody)">← Voltar ao login</button>
+      </div>
     </div>
 
     <!-- FORM RECUPERAR SENHA -->
@@ -2094,7 +2116,7 @@ function initPlanGuards(){
    AUTH FUNCTIONS
 ═══════════════════════════════════════ */
 function authTab(tab){
-  ['form-login','form-signup','form-recuperar'].forEach(function(id){
+  ['form-login','form-signup','form-recuperar','form-verify'].forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.style.display='none';
   });
@@ -2113,8 +2135,23 @@ function authTab(tab){
   if(bs) bs.style.display='';
 }
 
+function mostrarVerificacao(email){
+  ['form-login','form-signup','form-recuperar'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  var el=document.getElementById('form-verify');
+  if(el) el.style.display='block';
+  setAuthMsg('');
+  var lbl=document.getElementById('verify-email-lbl');
+  if(lbl) lbl.textContent = email||PENDING_SIGNUP_EMAIL;
+  var code=document.getElementById('otp-code');
+  if(code) code.value='';
+  setFieldErr('f-otp', false);
+}
+
 function mostrarRecuperacao(){
-  ['form-login','form-signup'].forEach(function(id){
+  ['form-login','form-signup','form-verify'].forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.style.display='none';
   });
@@ -2168,6 +2205,9 @@ function doLogin(){
     });
 }
 
+var PENDING_SIGNUP_EMAIL = '';
+var RESEND_OTP_COOLDOWN = 0, _resendOtpTimer = null;
+
 function doSignup(){
   if(!initSupabase()){ setAuthMsg('Configure o Supabase primeiro.','err'); return; }
   var nome  = (document.getElementById('auth-nome').value||'').trim();
@@ -2182,17 +2222,66 @@ function doSignup(){
   sb.auth.signUp({ email: email, password: pass, options:{ data:{ nome: nome } } })
     .then(function(res){
       setBtnLoadingNew('btn-signup', false);
-      if(res.error){ setAuthMsg(res.error.message,'err'); }
-      else {
-        /* Show success state */
-        document.getElementById('signup-success').style.display = 'block';
-        document.getElementById('btn-signup').style.display = 'none';
-        document.getElementById('auth-nome').value='';
-        document.getElementById('auth-email2').value='';
-        document.getElementById('auth-pass2').value='';
-        setTimeout(function(){ authTab('login'); }, 3000);
+      if(res.error){ setAuthMsg(res.error.message,'err'); return; }
+      if(res.data && res.data.session){
+        /* Confirmação de e-mail desligada no projeto: já entra direto */
+        toast('Conta criada!','ok');
+        return;
       }
+      /* Fluxo normal: precisa confirmar com código enviado por e-mail */
+      PENDING_SIGNUP_EMAIL = email;
+      document.getElementById('auth-nome').value='';
+      document.getElementById('auth-pass2').value='';
+      mostrarVerificacao(email);
+      startResendOtpCooldown();
     });
+}
+
+function doVerifyOtp(){
+  var code = (document.getElementById('otp-code').value||'').trim();
+  if(!/^\d{6}$/.test(code)){ setFieldErr('f-otp',true); toast('Digite o código de 6 dígitos','err'); return; }
+  setFieldErr('f-otp', false);
+  setBtnLoadingNew('btn-verify', true);
+  sb.auth.verifyOtp({ email: PENDING_SIGNUP_EMAIL, token: code, type: 'signup' })
+    .then(function(res){
+      setBtnLoadingNew('btn-verify', false);
+      if(res.error){
+        setFieldErr('f-otp', true);
+        document.getElementById('err-otp').textContent = 'Código inválido ou expirado';
+        setAuthMsg('','');
+        return;
+      }
+      /* Sucesso: onAuthStateChange detecta a sessão e chama goApp() automaticamente */
+      toast('E-mail confirmado!','ok');
+    });
+}
+
+function doResendOtp(){
+  if(RESEND_OTP_COOLDOWN > 0 || !PENDING_SIGNUP_EMAIL) return;
+  sb.auth.resend({ type:'signup', email: PENDING_SIGNUP_EMAIL })
+    .then(function(res){
+      if(res.error){ setAuthMsg(res.error.message,'err'); return; }
+      toast('Código reenviado!','ok');
+      startResendOtpCooldown();
+    });
+}
+
+function startResendOtpCooldown(){
+  RESEND_OTP_COOLDOWN = 30;
+  updateResendOtpBtn();
+  if(_resendOtpTimer) clearInterval(_resendOtpTimer);
+  _resendOtpTimer = setInterval(function(){
+    RESEND_OTP_COOLDOWN--;
+    updateResendOtpBtn();
+    if(RESEND_OTP_COOLDOWN<=0) clearInterval(_resendOtpTimer);
+  }, 1000);
+}
+
+function updateResendOtpBtn(){
+  var b = document.getElementById('btn-resend-otp');
+  if(!b) return;
+  if(RESEND_OTP_COOLDOWN>0){ b.disabled=true; b.textContent = 'Reenviar código ('+RESEND_OTP_COOLDOWN+'s)'; }
+  else { b.disabled=false; b.textContent = 'Reenviar código'; }
 }
 
 function doGoogle(){
@@ -5059,6 +5148,7 @@ if(typeof supabase !== 'undefined' && !SUPA_URL.includes('COLE_')){
   startAuthListener();
 } else {
   /* Dev mode: skip login, use localStorage */
+  goApp();
   renderCal();
   renderDash();
   loadAllData();
