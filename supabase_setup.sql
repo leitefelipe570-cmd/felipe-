@@ -198,3 +198,8 @@ create policy "avatar_update" on storage.objects
 -- ══════════════════════════════════════════════════════════
 --  PRONTO! Todas as tabelas e políticas criadas com sucesso.
 -- ══════════════════════════════════════════════════════════
+
+-- ── MIGRAÇÃO: Integração Google Sheets (planilhas) ─────────
+-- Rode este bloco separadamente se o setup acima já foi executado antes.
+alter table public.user_planilhas add column if not exists sheet_url    text;
+alter table public.user_planilhas add column if not exists sheet_secret text;
