@@ -142,6 +142,14 @@ body{font-family:var(--fBody);background:var(--bg);color:var(--t1);font-size:14p
 
 /* ── MAIN ─────────────────────────────────────── */
 .main{flex:1;margin-left:var(--nav);display:flex;flex-direction:column;min-height:100vh}
+
+/* ── PRÉ-LOGIN: nenhum chrome do app visível ─────
+   Sidebar e topbar são elementos fixos independentes das .pg,
+   então precisam ser escondidos explicitamente antes de autenticar. */
+body.pre-auth .sidebar{display:none!important}
+body.pre-auth .topbar{display:none!important}
+body.pre-auth .bnav{display:none!important}
+body.pre-auth .main{margin-left:0}
 .pg{display:none;padding:28px 26px 52px;animation:pgIn .22s var(--ease)}
 .pg.on{display:block}
 @keyframes pgIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
@@ -694,7 +702,7 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
-<body>
+<body class="pre-auth">
 
 <!-- PAGE TRANSITION OVERLAY -->
 <div id="sv-transition" style="position:fixed;inset:0;z-index:8000;background:#0a0a0a;pointer-events:none;opacity:0;transform:scaleY(0);transform-origin:bottom;transition:transform .4s cubic-bezier(.25,.1,.25,1),opacity .4s ease"></div>
@@ -779,7 +787,7 @@ input[type=range]{padding:0;height:4px;border-radius:2px;background:var(--s4);ac
 </aside>
 
 <!-- ══ TOPBAR ════════════════════════════════════ -->
-<header class="topbar" id="topbar">
+<header class="topbar" id="topbar" style="display:none">
   <div class="tb-logo">Su<em>vita</em></div>
   <div style="display:flex;align-items:center;gap:8px">
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-m" title="Alternar tema" aria-label="Alternar tema claro/escuro"></button>
@@ -1819,15 +1827,21 @@ function startAuthListener(){
 }
 
 function showAuthPage(){
+  AUTH_USER = null;
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');p.style.display='';});
   var ap = document.getElementById('pg-auth');
   if(ap) ap.classList.add('on');
   document.querySelectorAll('.ni,.bn').forEach(function(n){n.classList.remove('on');});
+  /* Sem sidebar/topbar/bottom-nav na tela de login — nada ali é navegável antes de entrar */
+  document.body.classList.add('pre-auth');
+  closeSb();
 }
 
 function goApp(){
   var ap = document.getElementById('pg-auth');
   if(ap){ ap.classList.remove('on'); ap.style.display=''; }
+  /* Revela sidebar/topbar agora que a sessão foi confirmada */
+  document.body.classList.remove('pre-auth');
   /* Update Conta button to show logged-in state */
   var bnconta = document.getElementById('bn-conta');
   if(bnconta) bnconta.style.color = 'var(--gold)';
@@ -2427,6 +2441,10 @@ var NM={dash:0,metas:1,tarefas:2,rotina:3,financeiro:4,planilha:5,analitico:6,ex
 var BM={dash:0,metas:1,tarefas:2,financeiro:3,planilha:4,analitico:5,extrato:6,planos:7,auth:8};
 
 function go(id){
+  /* Bloqueio de acesso: nenhuma página do app é navegável sem sessão válida,
+     mesmo chamando go() direto (ex: console do navegador) */
+  var authObrigatorio = typeof supabase!=='undefined' && !SUPA_URL.includes('COLE_');
+  if(authObrigatorio && !AUTH_USER){ showAuthPage(); return; }
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
   document.querySelectorAll('.bn-btn').forEach(function(b){b.classList.remove('on');});
